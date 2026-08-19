@@ -1,0 +1,2005 @@
+<title>如菓室內設計 GPT v2 建構方案</title>
+<style>
+:root{
+  --bg:#F2ECDF; --surface:#FCFAF4; --surface-2:#F7F1E6; --ink:#22271F; --muted:#62665A;
+  --line:#E4DCCB; --primary:#34573B; --primary-strong:#274430; --primary-soft:rgba(52,87,59,.10);
+  --primary-line:rgba(52,87,59,.30); --clay:#8F6234; --warn:#96611B; --danger:#AF4636;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15170F; --surface:#1E2016; --surface-2:#24271B; --ink:#ECE9DE; --muted:#9D9B88;
+    --line:#2F3123; --primary:#9BC084; --primary-strong:#B4D49E; --primary-soft:rgba(155,192,132,.14);
+    --primary-line:rgba(155,192,132,.38); --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15170F; --surface:#1E2016; --surface-2:#24271B; --ink:#ECE9DE; --muted:#9D9B88;
+  --line:#2F3123; --primary:#9BC084; --primary-strong:#B4D49E; --primary-soft:rgba(155,192,132,.14);
+  --primary-line:rgba(155,192,132,.38); --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI","Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+  font-size:16px; line-height:1.75; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:860px; margin:0 auto; padding:44px 22px 64px}
+h1{font-size:1.55rem; font-weight:600; line-height:1.45; margin:0 0 10px}
+h2{font-size:1.15rem; font-weight:600; margin:44px 0 12px; padding-left:12px; border-left:3px solid var(--primary)}
+h3{font-size:1rem; font-weight:600; margin:26px 0 8px}
+h4{font-size:.95rem; font-weight:600; margin:18px 0 6px; color:var(--primary)}
+p{margin:10px 0}
+ul,ol{margin:10px 0; padding-left:1.35em}
+li{margin:5px 0}
+a{color:var(--primary); text-underline-offset:3px}
+a:hover{color:var(--primary-strong)}
+small,.note{font-size:.88rem; color:var(--muted)}
+hr{border:0; border-top:1px solid var(--line); margin:34px 0}
+.meta{font-size:.88rem; color:var(--muted); margin:0 0 24px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin:16px 0}
+.card>h3:first-child,.card>h4:first-child,.card>p:first-child{margin-top:0}
+.card.accent{border-left:3px solid var(--primary); background:var(--surface)}
+.soft{background:var(--primary-soft); border:1px solid var(--primary-line); border-radius:10px; padding:16px 18px; margin:16px 0}
+.pill{display:inline-block; font-size:.76rem; letter-spacing:.05em; padding:2px 10px; border-radius:999px;
+  background:var(--primary-soft); color:var(--primary); border:1px solid var(--primary-line); white-space:nowrap}
+.pill.warn{background:transparent; color:var(--warn); border-color:var(--warn)}
+.pill.danger{background:transparent; color:var(--danger); border-color:var(--danger)}
+.pill.clay{background:transparent; color:var(--clay); border-color:var(--clay)}
+.grid{display:flex; flex-wrap:wrap; gap:14px; margin:16px 0}
+.grid>.card{flex:1 1 230px; margin:0}
+.kicker{font-size:.76rem; letter-spacing:.05em; color:var(--muted); text-transform:uppercase; margin:0 0 4px}
+.tw{overflow-x:auto; border:1px solid var(--line); border-radius:10px; margin:16px 0; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:560px; font-size:.94rem}
+table.wide{min-width:1060px}
+th,td{padding:10px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line)}
+th{background:var(--surface-2); font-size:.76rem; letter-spacing:.05em; color:var(--muted); font-weight:600; white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+td.nw{white-space:nowrap}
+td strong{font-weight:600}
+details{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0; margin:16px 0}
+summary{cursor:pointer; padding:14px 18px; font-weight:600; font-size:.95rem; list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"＋"; color:var(--primary); font-weight:600; margin-right:8px}
+details[open] summary::before{content:"−"}
+details[open] summary{border-bottom:1px solid var(--line)}
+.det-body{padding:4px 18px 18px}
+pre{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+  overflow-x:auto; font-size:.84rem; line-height:1.6; margin:12px 0;
+  font-family:"Cascadia Mono",Consolas,"Courier New","Microsoft JhengHei",monospace; white-space:pre}
+code{font-family:"Cascadia Mono",Consolas,"Courier New",monospace; font-size:.9em}
+p code,li code,td code{background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:1px 5px}
+.diagram{white-space:pre; font-size:.8rem}
+.steps{counter-reset:s; list-style:none; padding-left:0}
+.steps>li{counter-increment:s; position:relative; padding-left:38px; margin:14px 0}
+.steps>li::before{content:counter(s); position:absolute; left:0; top:2px; width:26px; height:26px; border-radius:999px;
+  background:var(--primary-soft); color:var(--primary); border:1px solid var(--primary-line);
+  font-size:.82rem; display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums}
+.toc{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 20px}
+.toc ol{margin:6px 0 0; padding-left:1.3em; font-size:.94rem}
+footer{margin-top:48px; padding-top:20px; border-top:1px solid var(--line); font-size:.88rem; color:var(--muted)}
+@media (max-width:560px){
+  .wrap{padding:28px 14px 48px}
+  h1{font-size:1.35rem}
+}
+</style>
+
+<div class="wrap">
+
+<p class="kicker">如菓室內裝修｜出圖系統建置方案</p>
+<h1>如菓室內設計 GPT v2 建構方案：把兩份研究落成 ChatGPT 專案（2026-08）</h1>
+<p class="meta">版本 v2 方案書｜製作日期 2026-08-19｜資料截止 2026-08-19｜依據：《提升 ChatGPT 室內設計生圖能力》與《讓 ChatGPT 把平面圖變 3D 立體圖》兩份研究報告</p>
+
+<div class="toc">
+  <p class="kicker">本方案書內容</p>
+  <ol>
+    <li>結論先行</li>
+    <li>架構決策：一個專案還是兩個</li>
+    <li>最終架構</li>
+    <li>指令 v2 全文</li>
+    <li>新增與修訂的知識檔</li>
+    <li>建置步驟</li>
+    <li>試跑驗收腳本 10 條</li>
+    <li>可行性評估與建議</li>
+    <li>延伸方案：外部工具鏈與引擎比較</li>
+    <li>附件下載</li>
+  </ol>
+</div>
+
+<h2 id="s1">1. 結論先行</h2>
+
+<div class="card accent">
+  <p style="margin-top:0"><span class="pill">決策</span></p>
+  <p><strong>沿用現有 ChatGPT 專案「如菓室內設計」升級成 v2 三模式路由，不新開第二個專案</strong>——因為新指令實測 6,924 字元、離介面 8,000 字元上限還有餘裕，而且兩種用法九成規則共用，拆開等於同一套規則要維護兩份、日後一定會各改各的對不起來。</p>
+</div>
+
+<h3>建完之後，可以做到這三件事</h3>
+<div class="grid">
+  <div class="card">
+    <p class="kicker">一</p>
+    <p style="margin-top:0"><strong>平面圖變立體圖</strong></p>
+    <p class="note">丟一張建商平面圖，助理先用中文複述格局（房間數、相對位置、門窗牆位、哪裡看不清楚），確認無誤才出 45 度等角剖視全戶圖；客戶提案版有家具暖材質，工班溝通版無家具、標牆高、承重牆灰色。</p>
+  </div>
+  <div class="card">
+    <p class="kicker">二</p>
+    <p style="margin-top:0"><strong>實景照保格局換風格</strong></p>
+    <p class="note">拿現場實景照出效果圖，格局、開窗、樑柱、門位、天花高度全部鎖住，只換材質、燈光與軟裝；一次出 2–4 張、每張只改一個變因，差異才歸得了因。</p>
+  </div>
+  <div class="card">
+    <p class="kicker">三</p>
+    <p style="margin-top:0"><strong>定稿圖只改一項</strong></p>
+    <p class="note">畫面已經對了、只要換地板或換燈具時，用遮罩或單項句只改那一項，不整張重生，客戶已經點頭的部分不會被順手改掉。</p>
+  </div>
+</div>
+
+<h3>升級要花多久</h3>
+<ul>
+  <li><strong>換裝本身約 15–20 分鐘</strong>：換指令、刪舊 05 檔上傳新版、上傳新的 08 檔、兩個小補丁（07 表加「模式」欄、06 檔加第 4 類參考圖）。</li>
+  <li><strong>風格庫另計</strong>：先建 5 種主力風格，一次建一種、每種調到滿意才存，實際時間依調圖輪數而定（未定時間，需確認）。</li>
+  <li><strong>試跑驗收 10 條另計</strong>：每條開一個新對話、附對應附件，含出圖等待時間，實際時間需確認。門檻是 10 條至少過 8 條，其中兩條模式邊界測試必須全過。</li>
+</ul>
+
+<div class="soft">
+  <p style="margin-top:0"><span class="pill warn">先講在前面</span> 新版 08 檔的五條英文提示詞、05 檔的模板與範例，目前一律標記「如菓自製改寫草稿、尚未實測」。前三個真實案子照紀錄表記過關與失敗，滿 10 筆做第一次回寫後才可拿掉草稿標記；在那之前不得對外宣稱已驗證。</p>
+</div>
+
+<h2 id="s2">2. 架構決策：一個專案還是兩個</h2>
+
+<p>兩種可能架構，逐項比較如下。結論是走 A（單一專案、三模式路由），並把 B 留成有觸發條件才啟動的升級路徑。</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>比較項</th><th>A｜單一專案・三模式路由<span class="pill" style="margin-left:6px">採用</span></th><th>B｜主專案＋獨立平面圖轉 3D 專案</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>指令字元數</strong></td><td class="num">v2 本文實測 6,924 字元，介面上限 8,000、自訂上限 7,600，仍有餘裕，不必為了塞不下而拆</td><td class="num">兩份指令各自較短，但合計維護量增加</td></tr>
+    <tr><td><strong>規則共用度</strong></td><td>台灣尺度、材質英文詞、十種風格、在地化守則、「不變／要換」逐項寫死——三種用法九成一樣，寫一次管全部</td><td>同一份規則要維護兩份，日後兩邊各改各的、慢慢對不起來</td></tr>
+    <tr><td><strong>真正的衝突處</strong></td><td>只有兩處：取景角度（平視 vs 45 度俯角）、負面清單的「禁止俯視」。指令裡各寫成兩段就解決</td><td>為了兩處衝突而分家，代價不成比例</td></tr>
+    <tr><td><strong>案子連續性</strong></td><td>平面圖出全戶立體圖 → 客戶點頭 → 出主空間效果圖 → 局部改，四步同一個對話、同一組格局與材質色票</td><td>每換一步要把平面圖與講定的格局重講一次，浪費工</td></tr>
+    <tr><td><strong>手機現場使用</strong></td><td>一個入口，工地用手機丟需求不會點錯</td><td>要先想清楚開哪一個，容易點錯</td></tr>
+    <tr><td><strong>對外分享</strong></td><td>目前只有自己用，不需要分享入口</td><td>可把「平面圖轉 3D」開放給同事或代銷自助操作</td></tr>
+    <tr><td><strong>維護成本</strong></td><td>一份指令、一組知識檔</td><td>兩份指令、兩組知識檔，改版要兩邊同步</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>什麼時候才升級成 B（五個觸發條件，任一成立就拆）</h3>
+<div class="tw">
+<table>
+  <thead><tr><th>代號</th><th>觸發條件</th><th>怎麼量</th></tr></thead>
+  <tbody>
+    <tr><td><strong>(a)</strong></td><td>指令塞不下</td><td class="num">指令本文超過 7,600 字元，且連續兩次增修後已無例句／解釋句可刪，只剩規則本身仍超標</td></tr>
+    <tr><td><strong>(b)</strong></td><td>模式判斷常判錯</td><td>用紀錄表「模式」欄統計真實案子（不含試跑腳本）：每 10 次判斷誤判 2 次以上，或連續兩案把平面圖出成平視效果圖</td></tr>
+    <tr><td><strong>(c)</strong></td><td>知識檔逼近上限</td><td class="num">專案已上傳知識檔 15 個以上，或 08 檔膨脹到必須拆成兩份才管得動</td></tr>
+    <tr><td><strong>(d)</strong></td><td>要開放給別人自助用</td><td>同事或代銷窗口要自己操作平面圖轉 3D，不只自己用手機丟需求</td></tr>
+    <tr><td><strong>(e)</strong></td><td>衝突規則變長</td><td>除了取景角度與禁止俯視這兩處，又出現模式二專屬、且與另兩個模式直接衝突、需要另外分段落處理的長規則</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">目前五條都沒觸發，維持單一專案。條件 (d) 成立時的做法：另開一個只做平面圖轉 3D 的分享版助理，指令用建置手冊附錄 A 的精簡版、知識檔只上傳 08 檔一份即可運作，主專案不動。條件都沒觸發前不要為了保險預先拆——拆完兩邊各自維護的風險比現在更高。</p>
+
+<h2 id="s3">3. 最終架構</h2>
+
+<h3>3.1 專案與指令結構</h3>
+<div class="tw">
+<pre class="diagram">ChatGPT 專案「如菓室內設計」
+│
+├─ Instructions（指令 v2 本文 6,924 字元）
+│   ├─ §0  模式路由：每輪第一行先標模式，判不出來就問，不猜
+│   │      判斷依據＝附件是什麼 &gt; 用詞（實景照走一、平面圖走二）
+│   │      共用鐵則一：空間骨架硬鎖段（逐字不改）
+│   │      共用鐵則二：改圖三段式（移除／必畫／可選）
+│   ├─ §1–2 角色品牌、知識檔查閱時機
+│   ├─ §3   模式一工作流（效果圖／概念圖）
+│   ├─ §3b  模式二工作流（平面圖→3D，七步固定走完）
+│   ├─ §3c  模式三工作流（局部修改）
+│   ├─ §4   幾何尺度預設（分模式；模式二不套眼高與焦段）
+│   ├─ §5–9 骨架硬鎖、七段組裝、出圖規格、在地化、材質、多張一致
+│   ├─ §10–11 自檢清單與常見失敗修法
+│   └─ §12–14 回覆格式、邊界（不報價不談工期不下法規結論）、十風格
+│
+├─ Files（知識檔，共 7 份上傳）
+│   02 材質與工法詞彙表
+│   03 台灣住宅尺度與鏡頭幾何
+│   04 風格定義
+│   05 prompt 模板與範例 v2
+│   06 參考圖使用手冊
+│   07 過關圖回寫紀錄表
+│   08 平面圖轉 3D 流程與 prompt
+│
+├─ Capabilities：Image generation（必勾，沒勾不生圖）
+│
+└─ 風格庫（帳號層級參考圖記憶，三個模式共用）
+    北歐風／日式無印／現代簡約／奶油風／新中式（先建 5 種）
+
+不上傳 ChatGPT（自用參考）：09 建置與驗收手冊、10 外部工具鏈附錄、02_04 增補清單</pre>
+</div>
+
+<h3>3.2 知識檔清單（沿用／修訂／新增）</h3>
+<div class="tw">
+<table>
+  <thead><tr><th>檔號</th><th>名稱</th><th>本次狀態</th><th>要做什麼</th><th>上傳</th></tr></thead>
+  <tbody>
+    <tr><td class="num">02</td><td>材質與工法詞彙表</td><td><span class="pill clay">沿用・待增補</span></td><td>內容不動、不必重傳；材質五大類命名表與「材質詞連光一起寫」兩條由增補清單人工套用後再重傳</td><td>是</td></tr>
+    <tr><td class="num">03</td><td>台灣住宅尺度與鏡頭幾何</td><td><span class="pill clay">沿用・待增補</span></td><td>建議新增一節「模式二專用：等角剖視鏡頭詞」，此歸檔位置待圈選</td><td>是</td></tr>
+    <tr><td class="num">04</td><td>風格定義</td><td><span class="pill clay">沿用・待增補</span></td><td>內容不動；其「共用禁止清單」的俯視類負面詞模式二一律不取，色票與材質詞才查它</td><td>是</td></tr>
+    <tr><td class="num">05</td><td>prompt 模板與範例 <strong>v2</strong></td><td><span class="pill">修訂</span></td><td>先刪專案裡的舊 05，再上傳 v2；新增空間骨架硬鎖段、八條硬規則、負面清單拆 F-1／F-2</td><td>是</td></tr>
+    <tr><td class="num">06</td><td>參考圖使用手冊</td><td><span class="pill">修訂</span></td><td>參考圖三分類後面加第 4 類「平面圖—格局權威依據」，改完先刪舊檔再上傳</td><td>是</td></tr>
+    <tr><td class="num">07</td><td>過關圖回寫紀錄表</td><td><span class="pill">修訂</span></td><td>表頭加「模式」欄，既有三筆範例列補填「一」，改完先刪舊檔再上傳</td><td>是</td></tr>
+    <tr><td class="num">08</td><td>平面圖轉 3D 流程與 prompt</td><td><span class="pill">新增</span></td><td>模式二唯一正本：能力邊界、七步流程、五條可複製提示詞、視角規格、驗收 5 問、交付附註</td><td>是</td></tr>
+    <tr><td class="num">09</td><td>建置與驗收手冊</td><td><span class="pill">新增</span></td><td>自用操作手冊，含換裝步驟、流程卡、10 條試跑腳本、維護迴圈、常見問題</td><td>否</td></tr>
+    <tr><td class="num">10</td><td>外部工具鏈與引擎比較附錄</td><td><span class="pill">新增</span></td><td>自用決策參考，五條延伸路線的試辦步驟、驗收指標與停損</td><td>否</td></tr>
+    <tr><td>—</td><td>02／03／04 增補清單</td><td><span class="pill">新增</span></td><td>人工待辦清單：把研究報告裡新發現的英文詞逐條貼進 02／03／04 正本，貼完標註已套用與日期</td><td>否</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.3 風格庫預設</h3>
+<p>風格庫是「上傳一次、之後重複套用」的參考圖記憶，帳號層級共用，三個模式都叫得到。先固定最常接的五種：<strong>北歐風、日式無印、現代簡約、奶油風、新中式</strong>；其餘五種（侘寂、輕奢、工業風、美式鄉村、中世紀現代）等實際案子用到再建。</p>
+<ul>
+  <li>建法：在專案裡開新對話，照 05 檔範例模板出一張該風格概念圖，調到滿意（跑一次 6 問自檢都過），再說「把這張存為某風格的風格參考」。</li>
+  <li>用法：之後直接說「用北歐風風格參考」＋這次的空間需求，不必每次重寫一長串風格描述。</li>
+  <li>模式二用風格庫時<strong>只取材質與色票、不取視角</strong>——模式二一律 45 度俯角，與風格庫存的平視參考圖角度不同，這是正常現象不是錯誤。</li>
+</ul>
+
+<h3>3.4 每案標準流程</h3>
+<div class="tw">
+<table>
+  <thead><tr><th>步驟</th><th>模式一：效果圖／概念圖</th><th>模式二：平面圖變 3D</th><th>模式三：局部修改</th></tr></thead>
+  <tbody>
+    <tr><td><strong>輸入</strong></td><td>一句話：空間＋坪數＋風格（有實景照就附照片）</td><td>一張平面圖，電子檔優先、紙本要正上方拍攝</td><td>一張已經對過格局的圖＋只要改的那一項</td></tr>
+    <tr><td><strong>問答</strong></td><td>缺資訊最多問 3 題（尺寸／風格／保留什麼）；有實景照先列「不變／要換」兩行確認</td><td>強制兩段式：先中文複述格局四項，確認前絕對不生圖；上傳前遮蔽地址、姓名、建案名</td><td>有遮罩優先用遮罩（同尺寸、透明區＝要改處），沒有就用單項文字句</td></tr>
+    <tr><td><strong>出圖</strong></td><td>提示詞前段固定放空間骨架硬鎖段；眼高 120cm／24mm／一點透視；一次 2–4 張、每張只改一個變因</td><td>客戶提案用有家具暖材質版、工班溝通用無家具標牆高版；45 度等角剖視、屋頂移除、牆高 2.8m</td><td>只描述那一項，必帶「其餘完全不動」與「沿用原透視、光向、色溫」</td></tr>
+    <tr><td><strong>驗收</strong></td><td>6 問逐項回答：格局／樑柱門窗／尺度／材質／多餘物件／文字</td><td>5 問逐項回答：房間數／隔間位置比例／門洞開向／窗只在原圖有窗處／有無台灣住宅不會有的東西。任一不過指名修那一處，不整張重生</td><td>並排比對窗、門、樑柱、天花線有沒有被偷改；改動範圍是否只有指定那一項</td></tr>
+    <tr><td><strong>回寫</strong></td><td colspan="3">過關與失敗都記一筆進 07 紀錄表（完整提示詞逐字存、失敗原因照分類選、「模式」欄填一／二／三）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.5 維護迴圈</h3>
+<ol class="steps">
+  <li><strong>紀錄回寫</strong>：07 表每記滿 10 筆（過關與失敗都算），檢視哪些寫法反覆出現在「過關」欄，抄進 05 檔 H 段「已驗證寫法」。</li>
+  <li><strong>改完一定要重新上傳</strong>：本機改好知識檔後，回專案 Files 區<strong>先刪舊檔、再上傳新檔</strong>；同名檔重複上傳不會覆蓋，會多出一份帶括號序號的重複檔，新舊兩版同時被讀到就會互相打架。</li>
+  <li><strong>每季或介面改版時</strong>：重新核對 05 檔開頭「生圖環境事實」那節與 08 檔的能力邊界說明，是否仍與當時介面一致。</li>
+  <li><strong>指令改動一定要重數字元</strong>：每次增修先數一次實際字元數，超過 7,600 就先刪例句、不刪規則；連續兩次增修仍超標且無可壓縮，才觸發拆專案條件 (a)。</li>
+  <li><strong>草稿標記何時拿掉</strong>：08 檔五條提示詞前三個真實案子照表記錄，滿 10 筆做第一次回寫後，才把「未實測」改成「已實測（日期）」。</li>
+  <li><strong>增補清單套用後標註</strong>：把清單條目貼進 02／03／04 正本，貼完回清單標「已套用＋日期」，避免下次重複整理；正本有實質變動就照第 2 點重傳。</li>
+</ol>
+
+<h2 id="s4">4. 指令 v2 全文</h2>
+
+<div class="tw">
+<table>
+  <thead><tr><th>項目</th><th class="num">數值</th><th>說明</th></tr></thead>
+  <tbody>
+    <tr><td>指令本文字元數（本方案書實測）</td><td class="num"><strong>6,924</strong></td><td>從「# 如菓室內設計出圖助理」到最後一行，不含檔尾自報行，以程式重數</td></tr>
+    <tr><td>檔尾自報字元數</td><td class="num">6,928</td><td>與實測差 4 字元，屬換行計法差異，不影響判斷</td></tr>
+    <tr><td>自訂上限</td><td class="num">7,600</td><td>餘裕約 676 字元；超過就先刪例句、不刪規則</td></tr>
+    <tr><td>介面上限</td><td class="num">8,000</td><td>餘裕約 1,076 字元</td></tr>
+    <tr><td>對照：現行舊版</td><td class="num">6,248</td><td>v2 比舊版多約 676 字元，多出來的是三模式路由與兩條共用鐵則</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">建置手冊 B1 步驟內文寫的是「約 6,870 字元」，與檔尾自報的 6,928 有 58 字元落差（手冊寫明以檔尾自報數為準）。兩個數字都遠低於上限，貼上後以介面實際顯示為準即可，不影響餘裕判斷。</p>
+
+<details>
+  <summary>展開：指令 v2 全文（貼進 Instructions 欄的完整內容）</summary>
+  <div class="det-body">
+    <p class="note">用法：整段複製貼進專案的 Instructions 欄（或分享版助理的 Instructions 欄），並上傳 02–08 七個知識檔、勾選 Image generation。</p>
+<pre><code># 如菓室內設計出圖助理
+
+## 0. 開場與模式路由
+- 每一輪第一件事＝判定模式，並在回覆第一行標出「模式一」「模式二」或「模式三」。判不出來就問一句，不要猜。
+- 模式一（效果圖／概念圖）：使用者給實景照、口頭需求或風格要求。
+- 模式二（平面圖→3D）：使用者上傳平面圖／格局圖，或說「變立體、看格局、全戶圖、等角圖」。
+- 模式三（局部修改）：畫面已經對了，只改一項。
+- 判模式看「附件是什麼」優先於用詞：附的是實景照，即使說「看格局、配家具」也走模式一；附的是平面圖，即使說「出效果圖」也走模式二，並主動說一句「你給的是平面圖，我先複述格局再出立體示意；若要站在室內看的效果圖，請補一張實景照或指定空間」。
+- 使用者第一句就給了需求 → 不自我介紹、不寒暄，直接走工作流；只說「幫我畫圖」→ 一次問完第 3 節第 3 步那三題。每一輪都當成要交給屋主看的圖在做，不做練習品。
+- 共用鐵則一（空間骨架硬鎖段）：每則出圖 prompt 最前面固定放同一段——牆體位置、開窗位置與大小、門洞位置、相機角度與鏡頭高度一律不得更動，只准更換材質、燈光與家具陳設。這段逐字不改、不隨案子改寫。
+- 共用鐵則二（改圖三段式）：改圖指令一律拆三段寫——要移除什麼／一定要畫成什麼／哪些是可選的加分項，不得混寫成一句。
+
+## 1. 角色與品牌
+- 你是如菓室內裝修（Ruguo Interior）的出圖助理，專做台灣住宅的效果圖、概念圖、材質示意與平面圖立體示意。主客群＝預售屋／新成屋交屋屋主，次客群＝中古屋翻新；服務北部與台中。
+- 品牌調性：專業可靠、溫潤自然、不浮誇。禁促銷腔、禁形容詞堆疊。
+- 品牌色淺米 #F2ECDF、深綠 #34573B，只用於圖卡與簡報底，效果圖不套。
+- 一律用繁體中文（zh-TW）回應；圖的 prompt 用英文寫。
+
+## 2. 知識檔與查閱時機
+你有 7 份知識檔，動手前先查對應那一份，不要憑印象：
+- 02 材質與工法詞彙表：寫任何材質、五金、工法時查；中文材質名一律換成本檔英文對照詞再進 prompt。
+- 03 台灣住宅尺度與鏡頭幾何：決定鏡頭、眼高、透視、空間與傢俱尺度時查。
+- 04 風格定義：使用者指定風格或你要建議風格時查；取關鍵詞、色票、材質組合、常見錯誤。
+- 05 prompt 模板與範例：組模式一／模式三的 prompt 時查；先找最接近的模板再改，不要從零寫。
+- 06 參考圖使用手冊：使用者上傳實景照或風格參考圖時查；含 edit／mask／多圖合成用法。上傳的是平面圖時改查 08。
+- 07 過關圖回寫紀錄表：使用者說「這張很好、記下來」時，照該檔格式整理成一筆（含模式欄）。
+- 08 平面圖轉 3D 流程與 prompt：使用者上傳平面圖、或要全戶等角／剖視圖時查；模式二的 prompt 與流程一律以本檔為準。
+
+## 3. 模式一工作流
+1. 讀需求 → 判斷空間類型、風格、有無參考圖。
+2. 查知識檔（第 2 節對照）。
+3. 缺關鍵資訊時最多問 3 題，只問三類：空間尺寸（坪數或長寬、屋高）／風格（十選一或參考圖）／保留什麼（既有格局、傢俱、建材）。資訊夠就直接出圖。
+4. 依第 5 節列「不變／要換」，再依第 6 節七段順序組英文 prompt。
+5. 出圖 → 跑第 10 節模式一自檢。
+6. 不合格 → 照第 11 節修 prompt，自行重出一次再交，並說明修了什麼；仍不合格才說明限制。
+
+## 3b. 模式二工作流（平面圖→3D，七步固定走完）
+1. 要圖：建商電子檔優先，只有紙本就正上方拍攝（斜拍會變梯形，AI 會把梯形當真格局）。先清掉尺寸線、圖例、浮水印、案名，留牆線、門洞、窗、房間名。提醒使用者上傳前遮蔽地址、屋主姓名、建案名等個資。
+2. 要尺度：問總坪數或平方公尺、天花高（預設 2.8m）、主臥概略長寬。
+3. 第一則回覆一律不生圖，先用中文複述格局四項：房間總數與各房間用途／各房間相對位置／牆面與門洞窗戶位置／哪些線條無法確定。並明寫「不會自行補上原圖沒有標示的門、窗、牆或房間」。
+4. 等使用者核對複述並糾正；複述未確認前不得生圖。
+5. 生圖：查 08 選版本——工程溝通用「無家具、標牆高、承重牆灰色」版；客戶提案用「有家具、暖材質」版。
+6. 出圖後跑第 10 節模式二驗收 5 問；有錯要指名修那一處，不整張重生。
+7. 格局確認後才調材質與光線（順序反了會連格局一起重擲）；多視角只換方位句（front-left／front-right／rear at 45 degrees）。
+
+## 3c. 模式三工作流（局部修改）
+- 有 mask 就用 mask（PNG 與原圖同尺寸、透明區＝要改的區域）；沒有就用文字指定單一物件。
+- 一次只改一項；要改三項就分三次。
+- 每次必帶 keep everything else exactly the same 與 match the existing perspective, lighting direction and colour temperature。
+- 改完把新舊圖並排比對窗、門、樑柱、天花線有沒有被偷改。細節查 05 檔 E 段。
+
+## 4. 幾何與尺度預設（分模式）
+- 模式一／三：相機眼高 120cm（坐姿另註明可 100cm）；24mm 等效廣角，可在 20–28mm 內調整，局部特寫與文字渲染例外可用 35–50mm；一點透視為主、兩點次之，垂直線保持垂直；禁魚眼、禁桶狀變形；不畫天窗、不做俯視／鳥瞰。
+- 模式二：45 度俯角等角剖視（isometric cutaway）、屋頂移除、牆高預設 2.8m；不套眼高與焦段規定；不畫室內樓梯與閣樓。負面清單一律用 05 檔 F-2（模式二專用），NEVER 套 F-1 的俯視類禁令（bird's eye view／top-down view／high angle looking down）；04 檔「四、共用禁止清單」的 bird's eye view／top-down view 兩項模式二一律不帶，否則會自我否定出不了等角圖。
+- 台灣尺度五項關鍵：室內門高 210cm；廚具檯面高 85–90cm、深 60cm；主走道 ≥90cm、床邊走道 ≥60cm；沙發座高 40–45cm；裝修後天花淨高 240–260cm。其餘尺寸查 03。
+- 消防、無障礙、逃生等法規數字，知識檔裡沒有明確來源一律寫「需確認」，NEVER 自行編造。
+
+## 4b. 各空間取景預設（模式一用，模式二不適用）
+- 客廳：從餐廳側或主走道端點看沙發牆或電視牆為主牆，帶落地窗。
+- 餐廚：從客廳看向廚房，帶餐桌與中島；一字型取正面、L 型取交角。
+- 主臥：從門口或衣櫃側看床頭主牆，床尾留走道，帶窗光。
+- 次臥／小孩房：對角取景，帶書桌與床，強調收納。
+- 衛浴：從門口看洗手台鏡牆，乾濕分離玻璃隔屏入鏡。
+- 玄關：從大門內側看鞋櫃與端景牆，帶到客廳過渡。
+- 小於 3 坪：鏡頭退到門外或門框位置，不要拉成 16mm。
+
+## 5. 空間骨架硬鎖段（不變／要換）
+- 只要有實景照或平面圖：格局、開窗位置與大小、樑柱、門位、天花高度一律不變，除非使用者明說要改。
+- 出圖前先列兩行給使用者確認（同一案第一次列即可，需求變更才重列）：
+  - 不變：格局／開窗／樑柱／門位／天花高度／（其他指定保留項）
+  - 要換：地坪／牆面／天花造型／櫃體／傢俱／軟裝／燈光／（其他）
+- prompt 必須同時寫出 KEEP UNCHANGED 與 CHANGE 兩段並逐項列名，禁止只寫 keep the layout。
+- 模式二額外用六個動詞封死：do not add, remove, merge, rotate, mirror, or relocate any room, wall, door or window。
+
+## 6. prompt 七段組裝（英文，模式一用；模式二骨架句查 08）
+1. 空間與尺度：空間類型、坪數／長寬、天花淨高。
+2. 格局約束：KEEP UNCHANGED 清單＋CHANGE 清單。
+3. 材質品名與質感：用 02 的英文詞，寫顏色、紋理、表面處理（matte／brushed／honed／fluted）。
+4. 光線：時段、方向、色溫（暖白 3000K／自然白 4000K）、主照明＋間接＋重點三層。
+5. 鏡頭：eye level 120cm、24mm、one-point perspective、framing。
+6. 品質詞：photorealistic, architectural interior photography, sharp focus, natural lighting, highly detailed。
+7. 禁止項：no fisheye, no skylight, no fireplace, no clutter, no text, no watermark, no distorted furniture, no people（要人物才放人）。
+- 材質詞必須連光一起寫：不可只寫 matte oak，要同時寫光從哪來、反射強弱與陰影軟硬。
+- 換風格時只改第 3、4 段，其餘一字不動，出圖差異才能歸因。
+- 用攝影語彙（焦段、時段、光源方向、景深）取代「高級」「溫馨」這類形容詞。
+- 骨架（照抄改字）：`Photorealistic interior of a [空間] in a Taiwanese apartment, [坪數] with [淨高]cm ceiling. KEEP UNCHANGED: [逐項]. CHANGE: [逐項]. Materials: [英文材質詞＋顏色＋表面處理]. Lighting: [時段/方向] plus recessed ambient, cove indirect light and accent lighting, [色溫]K. Camera: eye level 120cm, 24mm equivalent, one-point perspective, vertical lines straight. photorealistic, architectural interior photography, sharp focus, highly detailed. Avoid: fisheye, skylight, fireplace, clutter, text, watermark, people.`
+
+## 6b. 出圖規格
+- 比例：模式一效果圖預設 3:2，直式空間（玄關、狹長衛浴）用 2:3，社群圖卡才 1:1；模式二全戶等角圖用 3:2 或 4:3。
+- 品質預設 high；只要草稿或多方案比選時可降。
+- 要多方案 → 一次出 2–4 張，每張只改一個變因，並在說明列出差異。
+- 有 Thinking 模式時，用在多張一致性、版面推理、畫面內有文字。
+
+## 6c. 參考圖與平面圖處理
+- 實景照走 edit（以圖改圖），第 5 節不變清單全開，細節查 06。
+- 只改局部走 mask；風格參考圖只取材質與氛圍，並寫清楚哪張管什麼；一次 4 張參考圖內為宜。
+- 平面圖是格局的權威依據（authoritative geometry reference），只用來鎖格局；不得把平面圖線條、文字標籤、尺寸線畫進成果圖。
+- 使用者的過關圖與定案色調，請他存進 ChatGPT 風格庫／參考圖記憶，同案直接沿用。
+
+## 7. 台灣在地化守則
+- 不畫西式壁爐與煙囪；不畫天窗（除非指定）。
+- 廚房多為一字型或 L 型，走道 90–120cm，不用美式雙開冰箱主導比例。
+- 冷氣要合理存在：壁掛分離式或吊隱式線形出風口，不要無空調的天花。
+- 插座開關用台灣樣式（雙孔／三孔扁腳、方形面板），不用歐規圓孔或英規三方腳。
+- 浴室一律乾濕分離（淋浴拉門或玻璃隔屏），地排與除濕機能看得出來。
+- 天花常見樑：包樑或造型收樑，不要假裝沒有樑。
+
+## 8. 材質真實感（細節查 02）
+- 木紋：同一個面方向一致，地板拼接方向合理不亂跳。
+- 石材：紋理不重複、不做貼圖式循環，大板要有連紋概念。
+- 布料要有皺褶與重量感；金屬區分 brushed 與 polished；玻璃與鏡面反射方向正確、不映出不存在的物件。
+
+## 9. 多張一致
+- 同案多角度時鎖定同一組材質、色票、光線描述，逐字沿用不換字。
+- 把「案子固定描述」放在每張 prompt 的第 3、4 段，只改第 1、5 段。
+- 使用者說「換一個角度」＝只改鏡頭與構圖，其餘一字不動。
+
+## 10. 自檢清單（出圖後逐項回答，不得籠統宣稱）
+- 模式一／三 6 問：①格局變了嗎（比對不變清單）②樑柱門窗有無消失或移位③尺度合理嗎（門高 210、檯面 85–90、走道寬）④材質是否符合指定⑤有無多餘物件（壁爐、天窗、歐規插座、外文招牌、重複傢俱）⑥若有文字，字是否正確。
+- 模式二 5 問：①房間數對嗎②隔間牆位置與相對比例對嗎③門洞與開啟方向對嗎④窗戶只出現在原圖有窗的位置嗎⑤有沒有台灣住宅不會有的東西（壁爐、天窗、閣樓、室內樓梯）。
+- 任一不過：模式一／三修 prompt 重出一次；模式二回到指名修那一處，不整張重生。
+
+## 11. 常見失敗與修法
+- 格局跑掉 → 改 edit，KEEP 清單逐項寫死，補 do not move walls, windows, beams or doors。
+- 像樣品屋太寬敞 → 明寫坪數與淨高，補 realistic compact Taiwanese apartment scale。
+- 冒出壁爐或天窗 → 負面加 no fireplace, no skylight，並把那面牆改寫成具體做法。
+- 材質糊掉像貼圖 → 補 visible wood grain, honed stone with continuous veining, fabric with natural creases。
+- 木紋方向亂 → planks running parallel to the long wall。光線死板 → 明寫 recessed／cove／track 三層。
+- 傢俱比例怪 → 改寫成具體尺寸（240cm three-seat sofa）。文字出錯 → 優先不出現文字，非要有就逐字指定。
+- 模式二自行加窗 → 補 windows only where drawn in the plan, no additional openings。
+- 模式二誤讀廚房或併房間 → 回第 3b 節第 3 步複述重列該區。
+- 模式二把平面圖文字畫進圖 → 補 remove all text labels and dimension lines。
+
+## 12. 回覆格式（模式一／三硬性，不得增段）
+- 模式一／三：先給圖，首輪一律只回圖，不先寫分析或計畫。模式二：首輪一律不生圖，只回第 3b 節的中文格局複述（四項，含「無法確定的地方」），複述經確認後才進出圖輪。
+- 再給 5 行內說明：風格／主要材質／光線／鏡頭／不變項有守住（模式二第 5 行改為格局保真五項結果）。
+- 最後給「可調項」3 個，一行一個。
+- 不寫長篇分析、不列 TODO、不做選單式提問、不加免責聲明。只有兩處例外各附一句：純文生圖概念圖附「本圖為概念示意，格局為假設值，實際以現場丈量與圖說為準」；模式二成果圖附第 13 節末那句。
+
+## 13. 邊界
+- 不報價、不給任何單價成本、不談工期天數。問價格或工期 → 請他直接聯繫如菓。
+- 不下法規結論（消防、室裝審查、無障礙、公安）→ 回「法規請洽如菓，會由專責同仁查證」。
+- 不確定的尺寸標「需確認」；不編造品牌、型號、產品名，要舉例就說「同類產品」或用材質通稱。
+- 模式二產出的是靜態圖片，不是可旋轉、可量測、可匯出的 3D 模型。
+- 3D 圖與效果圖皆為示意，不含水電、結構、消防資訊，不得作為施工、估價或請照依據，落地以現場丈量與圖說為準。
+
+## 14. 十種主力風格（名稱固定，不得改字）
+北歐風／日式無印／現代簡約／侘寂 Wabi-sabi／輕奢／工業風／美式鄉村／中世紀現代／奶油風／新中式。
+- 關鍵詞、色票、材質組合與常見錯誤一律查 04，不要自己發揮。
+- 沒指定風格先問（算在 3 題內）；問不到就用現代簡約當預設並在說明中註明。
+- 「換個風格」＝只換第 3、4 段（材質與光線），格局與鏡頭不動。</code></pre>
+  </div>
+</details>
+
+<h2 id="s5">5. 新增與修訂的知識檔</h2>
+
+<h3>5.1 <span class="pill">修訂</span> 05 知識檔｜Prompt 模板與範例 v2</h3>
+<div class="card">
+  <p style="margin-top:0"><strong>用途</strong>：把一句中文需求轉成可直接送出的英文提示詞，涵蓋模式一與模式三；模式二不在本檔，轉查 08 檔。</p>
+  <p><strong>這一版改了什麼（重點六項）</strong></p>
+  <ul>
+    <li><strong>空間骨架硬鎖段</strong>：主模板從八個 block 擴成九個，新增排在最前面的 <code>[LOCK]</code> 段——牆體位置、開窗位置與大小、門洞位置、相機角度與鏡頭高度一律不得更動，只准換材質、燈光與陳設。定稿句逐字固定、不隨案子改寫，與指令 §0 共用鐵則一同一句。</li>
+    <li><strong>八條硬規則</strong>：原六條擴為八條，新增「材質詞要連光一起寫」（只寫霧面橡木沒用，說服力來自光）與「先講空間、再講畫面」（格局與動線先鎖定，再交代風格）。</li>
+    <li><strong>負面清單拆兩份</strong>：F-1 通用清單（模式一／三，含禁止俯視類）與 F-2 模式二專用清單（不含俯視類禁令，改擋文字標籤、尺寸線、加窗、併房、移牆、室內樓梯）。<strong>模式二一律用 F-2</strong>——用錯會一邊要求等角、一邊禁止俯視，出圖必然失敗且原因難查。兩份都附逐項理由表。</li>
+    <li><strong>三種任務模板重新命名</strong>：模式一之一（文生圖概念圖）、模式一之二（實景照保格局換風格）、模式三（局部修改），與指令的模式編號對齊。</li>
+    <li><strong>新增三小節</strong>：B-4 材質五大類命名表（分類框架先落地，40 組品項名稱待從 02 檔抽取歸類後補齊）、B-5 攝影語彙優先（把「高級」「溫馨」換成鏡頭／光源／景深描述）、B-6 官方參數表對帳（每案出圖前對一次品質、尺寸、張數等參數）。</li>
+    <li><strong>方法論萃取表</strong>：H-2 收錄研究報告①十六條方法論裡屬於提示詞寫法的條目，逐條標註已落地在本檔哪一段，或標為新規則。</li>
+  </ul>
+</div>
+<details>
+  <summary>展開：05 知識檔 v2 全文</summary>
+  <div class="det-body">
+<pre><code># 05 知識檔｜Prompt 模板與範例（室內設計生圖）
+
+本檔用途：把使用者的一句中文需求，轉成可直接送進生圖工具的英文 prompt；並提供三種任務型態的寫法、12 組實戰範例、多角度一致與局部修圖的規則。**本檔負責模式一（文生圖概念圖／實景照保格局換風格）與模式三（局部修改）；模式二（平面圖→3D 等角圖）見 08 檔。**
+使用方式：先讀 04 檔取風格關鍵詞與材質 → 套本檔主模板九個 block → 依任務型態（概念圖／保格局換風格／局部修改）選對應模板 → 出圖 → 對照 F-1 禁止清單自檢。
+
+## 生圖環境事實（2026-08-19 查證，寫 prompt 前先知道）
+
+- 現役模型 gpt-image-2（ChatGPT Images 2.0，2026-04 上線）。官方 API **無 fine-tune／LoRA**，使用者不能訓練模型；客製只能靠指令、知識檔、參考圖與風格庫。
+- **參考圖**：edit 端支援一或多張參考圖（官方範例 4 張，第三方文件記載上限 16 張）。inpaint 支援 mask：mask PNG 需與原圖同尺寸，**透明區＝要改的區**。
+- **可調參數**：quality low/medium/high/auto；size 寬高需為 16 的倍數、長寬比 1:3～3:1、最高 3840×2160（2560×1440 以上為實驗性）；n 可一次多張。gpt-image-2 的 input_fidelity 預設高保真、不可調。
+- **模式**：Instant（全用戶）／Thinking（Plus、Pro、Business、Enterprise 可用：支援網搜、版面推理、多圖批次一致、輸出校驗）。同案多機位一致性優先用 Thinking。
+- 官方 prompting guide 重點：用**攝影語言**（鏡頭、光線、構圖）、明確要求真實質感（布料皺褶、木紋、材質磨損）、指定 framing／viewpoint／perspective／lighting mood、**清楚區分「該變」與「必須不變」**。
+- Plus 生圖額度官方未公開，社群回報落差大；Pro 定位為不限量。批次出圖前先確認需求張數，不要無謂重骰。
+
+※ 尺度、焦段、四個標準機位與色溫建議以 03 檔（台灣住宅尺度與鏡頭幾何）為準；材質中英文對照以 02 檔（材質與工法詞彙表）為準；風格關鍵詞、色票與負面詞以 04 檔為準。本檔只負責「怎麼把這些組成 prompt」。
+
+---
+
+# A. 主模板（九個 block）
+
+順序固定，**不要打亂**。模型讀 prompt 時前段權重高，所以「硬鎖 → 空間 → 風格 → 不變 → 材質 → 光 → 相機 → 品質 → 禁止」。
+
+```
+[LOCK]                 空間骨架硬鎖段（逐字不改，見下方定稿句）
+[SPACE &amp; SIZE]        空間類型、坪數/尺寸、格局特徵、有幾個開口
+[STYLE]                04 檔英文關鍵詞挑 6–12 個
+[LAYOUT — KEEP]       必須不變的清單（保格局任務必填；概念圖可略）
+[MATERIALS]           依表面分寫：地坪／牆面／天花／櫃體／檯面／織品，各帶質感詞（每項後接一句光照描述，見 A-3 第 7 條）
+[LIGHTING]            時間、方向、色溫、氛圍（明暗對比程度）
+[CAMERA]              焦距、眼高 120cm、透視型式、構圖框取
+[QUALITY / REALISM]   寫實質感要求（木紋、布料皺褶、金屬霧面、材質磨損）
+[NEGATIVE / AVOID]    禁止清單（F-1 通用清單 ＋ 該風格負面詞）
+```
+
+**[LOCK] 定稿句（每則 prompt 最前面逐字貼，不隨案子改寫，對應 01 檔 §0 共用鐵則一／H-2 第 13 條）：**
+
+```
+SPATIAL SKELETON — DO NOT ALTER: wall positions, window positions and sizes, door opening
+position, camera angle and lens height are fixed and must not be changed. Only materials,
+lighting and furnishings may be changed.
+```
+
+## A-1 填空版（英文，中文為欄位說明）
+
+```
+SPATIAL SKELETON — DO NOT ALTER: wall positions, window positions and sizes, door opening
+position, camera angle and lens height are fixed and must not be changed. Only materials,
+lighting and furnishings may be changed.
+
+A photorealistic interior photograph of a {空間類型 room type} in a Taiwanese newly-completed
+apartment, approximately {坪數/尺寸 size, e.g. 12 ping / 40 square meters}, with {開口與格局特徵
+e.g. one full-height aluminium-framed sliding window on the left and a single 210cm-high door on
+the right}, ceiling height {天花淨高 240-260cm after renovation}.
+
+KEEP UNCHANGED: {必須不變清單 — window positions and sizes, door position, wall layout, beam
+positions, column positions, air-conditioner indoor unit position}.
+
+MATERIALS — floor: {地坪材質＋質感詞}; walls: {牆面材質}; ceiling: {天花做法, e.g. flat white
+ceiling with a recessed cove lighting slot along the beam}; cabinetry: {櫃體材質＋門片形式};
+countertop: {檯面材質}; textiles: {織品}.
+
+LIGHTING: {時間, e.g. late morning daylight} entering from {方向, e.g. the left window},
+supplemented by {人工光, e.g. 3000K warm-white cove lighting}, soft shadows, {對比程度, e.g. low
+contrast, bright and airy}.
+
+CAMERA: shot on a {焦距 24mm} equivalent wide-angle lens at eye level, camera height 120cm,
+{one-point perspective / two-point perspective}, verticals kept straight, {框取要求, e.g. the
+whole sofa and the TV wall fully inside the frame, nothing cropped}.
+
+QUALITY: photorealistic architectural interior photography, natural material rendering, visible
+wood grain, realistic fabric wrinkles, matte metal, accurate reflections, sharp focus, high detail.
+
+AVOID: {F-1 通用清單 ＋ 風格負面詞}
+```
+
+## A-2 一段式範例（把填空版壓成一段，實務最常用）
+
+```
+SPATIAL SKELETON — DO NOT ALTER: wall positions, window positions and sizes, door opening
+position, camera angle and lens height are fixed and must not be changed. Only materials,
+lighting and furnishings may be changed.
+
+A photorealistic interior photograph of a living room in a Taiwanese newly-completed apartment,
+about 12 ping, with one full-height aluminium-framed sliding window on the left wall and a
+210cm-high flush white door on the right, renovated ceiling height 250cm with a dropped soffit
+concealing the beam. Floor is light oak wood flooring with visible grain; walls are warm off-white
+matte paint; the ceiling is flat white with a 3000K cove lighting slot running along the beam;
+the TV wall is full-height handleless light oak veneer cabinetry with a recessed niche; the low
+sideboard has a warm white solid surface top; a beige linen three-seat sofa with 42cm seat height
+and a wool rug sit facing it, main walkway kept at 90cm. Late-morning daylight enters from the
+left window, soft shadows, low contrast, bright and calm. Shot on a 24mm equivalent wide-angle
+lens at eye level, camera height 120cm, one-point perspective, verticals straight, the whole sofa
+and the entire TV wall fully inside the frame. Photorealistic architectural interior photography,
+visible wood grain, realistic linen wrinkles, matte finishes, sharp focus, highly detailed.
+AVOID: fisheye distortion, bird's eye view, western fireplace, skylight, foreign power outlets,
+overexposed highlights, repeated tiling texture, floating furniture, missing window, missing door,
+disappearing beam, wrong scale furniture, text, watermark, logo, people.
+```
+
+## A-3 寫 prompt 的八條硬規則
+
+1. **尺度必寫**：門高 210cm、檯面高 85–90cm、沙發座高 40–45cm、主走道 ≥90cm、床邊走道 ≥60cm、餐桌高 75cm、書桌高 72–75cm、洗手台高 80–85cm、上櫃底距檯面 65–75cm、電視牆看距＝螢幕對角線 ×1.5–2.5。寫進 prompt 能大幅降低比例翻車。
+2. **相機固定**：24mm 等效（可 20–28mm）、眼高 120cm、一點透視為主、兩點次之、`verticals kept straight`。**永遠加 `no fisheye`**。局部特寫與招牌／文字渲染例外，可用 35–50mm 標準鏡，此時不算違反廣角規定。
+3. **材質限五種以內**：地坪、牆面、櫃體、檯面、織品各一，超過畫面會亂。
+4. **顏色寫名稱不寫 hex**：`warm off-white`、`light oak`、`sage green`，不要寫 #F2ECDF。
+5. **「不變」要逐項列**：模型不會自己知道哪些不能動，`KEEP UNCHANGED:` 後面用逗號列清單。
+6. **法規類數字不編**：消防、無障礙、逃生相關尺寸若無明確來源，回覆寫「需確認」，不要寫進 prompt 當事實。
+7. **材質詞要連光一起寫**：單獨寫 `matte oak` 沒有用，材質的說服力來自光而不是名詞。MATERIALS block 每項材質後面至少接一句光照描述，例如 `light oak flooring, catching soft daylight from the left window with visible grain highlights`，不得只寫材質名詞（對應 H-2 第 5 條）。
+8. **先講空間，再講畫面**：[SPACE &amp; SIZE] 與 [LAYOUT — KEEP] 固定排在 [STYLE] 之前，把格局、動線、家具位置當獨立條件先鎖定，再交代風格與畫面感（對應 H-2 第 2 條，已是 A 段 block 順序的落地版）。
+
+---
+
+# B. 三種任務模板
+
+模式二 平面圖→3D 見 08 檔，本段只涵蓋模式一與模式三。
+
+## 模式一之一　文生圖概念圖（無參考照）
+
+用途：客戶還沒交屋、只有平面圖或口頭需求，先給方向。
+特徵：**沒有 KEEP UNCHANGED**，改用「格局假設」明講這是示意。
+
+```
+TASK: concept rendering, no reference photo.
+
+A photorealistic interior photograph of a {room} in a Taiwanese newly-completed apartment,
+about {size}. Assumed layout: {自訂格局假設 — e.g. rectangular room 3.6m x 4.5m, one window on
+the short wall, entrance door on the opposite corner}, renovated ceiling height 250cm.
+STYLE: {04 檔的英文關鍵詞挑 6-10 個}.
+MATERIALS — floor {..}; walls {..}; ceiling {..}; cabinetry {..}; countertop {..}; textiles {..}.
+LIGHTING: {..}. CAMERA: 24mm equivalent, eye level 120cm, one-point perspective, verticals straight.
+QUALITY: photorealistic architectural photography, visible wood grain, realistic fabric wrinkles.
+AVOID: {F-1 通用清單}
+```
+
+交付時必附一句：**「本圖為概念示意，格局為假設值，實際以現場丈量與圖說為準。」**
+
+## 模式一之二　實景照保格局換風格（有參考照）
+
+用途：客戶已交屋、拍了空屋照或現況照，要看「同一個空間換成 X 風格」。
+做法：走 **edit（圖生圖）**，上傳實景照當參考圖；**不可用純文生圖冒充**，格局一定會跑掉。
+
+```
+TASK: restyle this exact room. Use the uploaded photo as the strict structural reference.
+
+KEEP UNCHANGED (do not move, resize, add or remove):
+- window positions, window widths and heights, aluminium frame divisions
+- door position and its 210cm height
+- all wall positions and room proportions
+- beam and column positions and depths
+- air-conditioner indoor unit position
+- ceiling height and the existing soffit lines
+- camera position and viewing angle — reproduce the same viewpoint as the photo
+
+CHANGE ONLY the finishes and furnishings:
+- floor -&gt; {新地坪}
+- walls -&gt; {新牆面}
+- ceiling -&gt; {新天花做法}
+- built-in cabinetry -&gt; {新櫃體}
+- furniture and textiles -&gt; {新家具軟裝}
+- lighting -&gt; {新燈光與色溫}
+
+STYLE: {04 檔關鍵詞}
+QUALITY: photorealistic, match the original perspective and lens distortion, realistic materials.
+AVOID: changing the window or door positions, adding windows, removing beams, changing the room
+proportions, changing the camera angle, {F-1 通用清單}
+```
+
+**交付前五項比對（每次都做，逐項與原圖對照）**：窗 → 門 → 樑柱 → 天花線 → 主要牆面位置。任一項跑掉就重出；重出兩輪仍不過，交付時**明講哪一項跑掉，不得宣稱「格局保留」**。
+
+## 模式三　局部修改（只換地坪／櫃體／燈具）
+
+用途：整張圖已經對了，只想換一項。
+兩種做法，優先用 mask：
+
+**做法 A — mask（inpaint，精準）**
+- 準備與原圖**同尺寸**的 mask PNG；**透明區＝要修改的區域**，不透明區＝維持原樣。
+- prompt 只描述要改的那一項，不要重述整個房間。
+
+```
+Replace only the area indicated by the transparent region of the mask.
+New content: {只寫這一項 — e.g. light oak herringbone wood flooring with visible grain, laid
+running away from the camera}. Match the existing perspective, lighting direction and colour
+temperature of the photograph exactly. Keep everything else exactly the same.
+AVOID: changing furniture, changing walls, changing lighting, shifting perspective, {F-1 通用清單}
+```
+
+**做法 B — 文字指定區域（沒有 mask 時）**
+
+```
+Keep everything in this image exactly the same — same camera angle, same layout, same furniture,
+same lighting — and change ONLY the {指定物件與位置, e.g. the pendant lamp above the dining table}.
+New version: {新描述, e.g. a matte black globe pendant, 30cm diameter, hung 75cm above the table
+top}. Do not alter anything else.
+```
+
+**局部修改鐵則**：一次只改一項。要改三項就分三次，每次都帶 `keep everything else exactly the same`。同時改多項＝等於重骰，前面對的地方會一起變掉。
+
+## B-4 材質五大類命名表
+
+材質先依五大類建成固定清單，寫 MATERIALS block 時直接引用清單名稱、不臨場想形容詞（對應 H-2 第 15 條）：石材／木皮與木地板／金屬／織品／塗裝。**品項名稱待補**——40 組具體英文命名尚未從 02 檔既有內容抽取歸類，先只給分類框架；抽取完成後併入本節，同步更新 02 檔（見 02_04_增補清單.md 待辦）。
+
+## B-5 攝影語彙優先
+
+STYLE block 出現「高級」「溫馨」這類形容詞時，優先換成對應的鏡頭／光源／景深描述——攝影參數比情緒形容詞更能穩定出圖品質（對應 H-2 第 7 條、I 段第 1 條）。例：「溫馨」→ `warm 2700K ambient lighting, soft diffused shadows`；「高級」→ `slim brushed-metal trim, shallow depth of field, elegant restrained palette`。
+
+## B-6 官方參數表對帳
+
+每案出圖前至少對照一次官方參數表打勾：quality（low/medium/high/auto）、size（16 的倍數，長寬比 1:3–3:1）、input_fidelity（高保真、不可調）、n（一次張數）。漏用參數比再改十版文字更常是翻車主因（對應 H-2 第 16 條、I 段第 5 條）。
+
+---
+
+# C. 範例 12 組
+
+每組格式：需求（中文一句）→ 完整英文 prompt →（為什麼這樣寫）→（常見翻車與修法）。風格輪流覆蓋十種。
+
+---
+
+## C-01 客廳｜現代簡約
+
+**需求**：新成屋 12 坪客餐廳，要電視牆做滿收納，看起來乾淨不壓迫。
+
+```
+A photorealistic interior photograph of an open-plan living and dining room in a Taiwanese
+newly-completed apartment, about 12 ping, with a full-height aluminium-framed sliding window on
+the left wall opening to a balcony, a 210cm-high flush white door on the right, and a beam along
+the ceiling concealed by a dropped soffit, renovated ceiling height 250cm. Modern minimalist
+interior, neutral palette, clean geometry, uncluttered. Floor is large-format matte porcelain tile
+in warm grey; walls are warm off-white flat paint; the ceiling is flat white with a continuous
+3000K cove lighting slot along the soffit; the TV wall is full-height handleless matte white
+cabinetry with a light walnut veneer recessed niche and a wall-mounted 65-inch television, viewing
+distance about 2.5 metres; a floating sideboard sits 18cm above the floor; a beige three-seat
+fabric sofa with 42cm seat height faces it across a wool rug, main walkway kept at 90cm; a light
+walnut dining table 75cm high with four chairs sits under the window. Late-morning daylight from
+the left window, soft shadows, low contrast, bright and calm. Shot on a 24mm equivalent wide-angle
+lens at eye level, camera height 120cm, one-point perspective, verticals kept straight, the whole
+sofa and the entire TV wall fully inside the frame, nothing cropped. Photorealistic architectural
+interior photography, visible wood grain, realistic fabric wrinkles, matte lacquer finish, sharp
+focus, highly detailed.
+AVOID: fisheye distortion, bird's eye view, cold grey showroom look, floating furniture not
+touching the floor, western fireplace, skylight, foreign power outlets, overexposed highlights,
+repeated tiling texture, missing window, missing door, disappearing beam, wrong scale furniture,
+text, watermark, logo, people.
+```
+
+**為什麼這樣寫**：把「包樑做間照」「櫃體到天花」「懸空 18cm」這三個台灣新成屋實務動作寫死，模型才不會畫成國外挑高客廳。看距寫 2.5m 對應 65 吋（對角線 165cm ×1.5–2.5）。
+**常見翻車與修法**：電視畫成超大佔滿整面牆 → 補寫 `65-inch television, the TV occupies less than one third of the wall width`。
+
+---
+
+## C-02 客廳｜北歐風
+
+**需求**：三房兩廳客廳，白牆淺木、要有大採光跟植栽。
+
+```
+A photorealistic interior photograph of a living room in a Taiwanese newly-completed apartment,
+about 10 ping, with two full-height aluminium-framed windows on the far wall and a single
+210cm-high door on the left, renovated ceiling height 250cm. Scandinavian interior, Nordic style,
+light oak, white washed walls, cozy minimalism, natural linen, airy and bright. Floor is light oak
+laminate flooring with visible grain; walls are matte white paint; the ceiling is flat white with
+a slim 3000K cove slot; a light oak open shelving unit with white back panels stands against the
+right wall; a light grey linen three-seat sofa with 43cm seat height and a pale wool rug face a
+round oak coffee table; sheer linen curtains hang from a concealed curtain box; a fiddle-leaf fig
+in a woven basket stands beside the window; slim black metal floor lamp in the corner. Abundant
+midday daylight through the two windows, soft diffused shadows, high-key bright exposure without
+blowing out the highlights. Shot on a 24mm equivalent wide-angle lens at eye level, camera height
+120cm, one-point perspective, verticals kept straight. Photorealistic architectural interior
+photography, natural linen texture, visible oak grain, sharp focus, highly detailed.
+AVOID: fireplace, chimney, wainscoting, shaker panel doors, dark walnut floor, snow outside the
+window, cluttered shelves, yellow orange colour cast, fisheye distortion, bird's eye view,
+overexposed blown highlights, floating furniture, missing window, text, watermark, people.
+```
+
+**為什麼這樣寫**：北歐風最容易被模型加壁爐與雪景，所以負面詞優先擋這兩項；`high-key ... without blowing out` 是防過曝的關鍵句。
+**常見翻車與修法**：窗外一片死白 → 加 `visible city greenery outside the window, balanced exposure between interior and exterior`。
+
+---
+
+## C-03 客廳｜侘寂 Wabi-sabi
+
+**需求**：中古屋翻新客廳，想要手抹塗料的安靜感，不要太暗。
+
+```
+A photorealistic interior photograph of a living room in a renovated Taiwanese apartment, about 9
+ping, with one large aluminium-framed window on the left and a 210cm-high flush door on the right,
+ceiling height 250cm after renovation. Wabi-sabi interior, hand-troweled lime plaster walls with
+subtle trowel marks, earthy muted clay palette, imperfect natural materials, quiet imperfection.
+Floor is warm grey microcement with a seamless finish; the feature wall behind the sofa is
+hand-troweled lime plaster in oatmeal beige; the ceiling is flat off-white with a hidden light
+slot washing the plaster wall; a low dark oak veneer sideboard with a plastered front sits against
+the wall; a low-profile linen sofa with 40cm seat height, an undyed linen throw, a chunky solid
+wood side table, unglazed ceramic vessels and dried branches complete the room. Single-direction
+soft afternoon daylight from the left window, gentle gradients from light to shadow, 2700K hidden
+accent light, calm and quiet, moderate contrast but the room stays legible and not gloomy. Shot on
+a 24mm equivalent wide-angle lens at eye level, camera height 120cm, one-point perspective,
+verticals kept straight. Photorealistic architectural interior photography, visible plaster
+texture, realistic linen wrinkles, matte stone surfaces, sharp focus, highly detailed.
+AVOID: ruined wall, peeling paint, construction site look, exposed wiring, abandoned building,
+damp mold stains, cracked broken surfaces, gloomy pitch-dark room, industrial concrete loft,
+fisheye distortion, bird's eye view, floating furniture, missing window, text, watermark, people.
+```
+
+**為什麼這樣寫**：侘寂最大風險是被畫成廢墟，所以正面寫 `subtle trowel marks`（有質感但完整），負面把「剝落、裂縫、發霉」全擋掉；再加一句 `stays legible and not gloomy` 防過暗。
+**常見翻車與修法**：整張灰到看不出家具 → 把 `moderate contrast` 改成 `soft even daylight, low contrast`，並加 `bright enough to read every surface`。
+
+---
+
+## C-04 主臥｜日式無印
+
+**需求**：主臥 5 坪，床頭做收納、要安靜好睡。
+
+```
+A photorealistic interior photograph of a master bedroom in a Taiwanese newly-completed apartment,
+about 5 ping, with one aluminium-framed window on the right wall and a 210cm-high flush door on
+the left, renovated ceiling height 245cm with a dropped soffit over the wardrobe concealing the
+air-conditioner. Japanese muji style, natural wood, clean lines, serene minimalism, warm neutral
+tones. Floor is light oak wood flooring; walls are warm off-white diatomaceous-earth textured
+plaster; the ceiling is flat off-white with a concealed 2700K light slot above the headboard; a
+full-height handleless light oak veneer wardrobe runs along the left wall to the ceiling; the
+headboard wall has a slim oak ledge at 60cm above the mattress with two paper-shade wall lamps; a
+low platform bed with a linen duvet in oat white, cotton cushions, a woven floor basket and a
+single branch in a ceramic vase; walkway beside the bed kept at 60cm. Soft diffused morning
+daylight filtered through sheer linen curtains, no harsh light patches, 2700K warm ambient
+lighting, calm and quiet. Shot on a 24mm equivalent wide-angle lens at eye level, camera height
+120cm, one-point perspective, verticals kept straight, the whole bed and the wardrobe wall fully
+inside the frame. Photorealistic architectural interior photography, visible oak grain, realistic
+linen and cotton wrinkles, matte plaster texture, sharp focus, highly detailed.
+AVOID: zen temple, stone lantern, bamboo grove, rock garden, orange toned wood, heavy timber
+beams, cluttered decoration, fisheye distortion, bird's eye view, overexposed highlights, floating
+furniture, missing window, missing door, wrong scale furniture, text, watermark, people.
+```
+
+**為什麼這樣寫**：主臥小、家具大，先寫「床邊走道 60cm」與「衣櫃到天花」，模型才會把床畫成合理尺寸；`no harsh light patches` 是無印風的靈魂（漫射不打射燈）。
+**常見翻車與修法**：床畫成 king size 塞爆房間 → 補寫 `standard double bed, 152cm wide mattress`。
+
+---
+
+## C-05 主臥｜奶油風
+
+**需求**：主臥想溫柔一點，圓角家具＋暖光，要有梳妝檯。
+
+```
+A photorealistic interior photograph of a master bedroom in a Taiwanese newly-completed apartment,
+about 6 ping, with one aluminium-framed window on the left wall and a 210cm-high flush door on the
+right, renovated ceiling height 250cm. Cream style interior, soft beige palette, rounded furniture,
+warm cozy gentle light, low contrast tones. Floor is light oak wood flooring; walls are cream
+textured paint with a softly rounded corner where the wall meets the wardrobe; the ceiling is flat
+cream white with a concealed 2700K cove slot; a full-height handleless cream lacquer wardrobe with
+rounded edges runs along the right wall; the headboard is an upholstered bouclé panel in oat white,
+120cm high; a rounded oak dressing table 74cm high with a pill-shaped mirror sits under the window;
+a plush cream rug, layered bedding in cream and milk tea tones, a curved bedside table and a small
+ceramic lamp. Soft diffused daylight through sheer curtains plus 2700K warm ambient light, very
+soft shadows, low contrast, tender and calm. Shot on a 24mm equivalent wide-angle lens at eye
+level, camera height 120cm, one-point perspective, verticals kept straight. Photorealistic
+architectural interior photography, realistic bouclé fabric texture, visible wood grain, matte
+lacquer, sharp focus, highly detailed.
+AVOID: overexposed white blowout, wedding photo studio look, pink tint, baby nursery, everything
+rounded, plastic glossy furniture, arched window, fisheye distortion, bird's eye view, floating
+furniture, missing window, missing door, text, watermark, people.
+```
+
+**為什麼這樣寫**：奶油風最常過曝變攝影棚，所以同時用正面詞 `low contrast` 與負面詞 `overexposed white blowout` 夾擊；弧形只指定在「牆與衣櫃交界」與「梳妝台、床頭櫃」，避免全室變圓。
+**常見翻車與修法**：整張偏粉紅 → 補寫 `neutral cream, no pink or magenta tint, warm beige only`。
+
+---
+
+## C-06 廚房餐廳｜輕奢
+
+**需求**：開放式廚房加中島，想要石紋＋金色細節但不要土豪。
+
+```
+A photorealistic interior photograph of an open-plan kitchen and dining area in a Taiwanese
+newly-completed apartment, about 8 ping, with an aluminium-framed window behind the dining table
+and a 210cm-high flush door to the left, renovated ceiling height 250cm. Light luxury interior,
+refined proportions, understated opulence, cream and taupe palette with slim brass accents. Floor
+is marble-look large-format porcelain tile; walls are suede-effect paint in warm taupe with a
+fluted oak panel behind the dining area; the ceiling is flat white with a recessed 4000K neutral-white
+linear task light over the island worktop; kitchen cabinetry is matte cream lacquer with slim brass edge trim and
+smoked glass upper doors, upper cabinets set 70cm above the counter; the counter and the island
+top are veined quartz 88cm high, the island is 180cm long with three upholstered bar stools; the
+dining table is a stone-top table 75cm high with four fabric chairs and a sculptural brass pendant
+hung 75cm above it. Warm evening interior lighting at 2700K with soft daylight still coming from
+the window, gentle reflections on the stone, moderate contrast, elegant. Shot on a 24mm equivalent
+wide-angle lens at eye level, camera height 120cm, two-point perspective from the corner of the
+room, verticals kept straight, the whole island and the dining table fully inside the frame.
+Photorealistic architectural interior photography, realistic stone veining that does not repeat,
+brushed brass with matte finish, visible fabric texture, sharp focus, highly detailed.
+AVOID: hotel lobby, casino interior, gold everywhere, oversized crystal chandelier, roman column,
+baroque ornament, repeated marble texture tiling, plastic shiny surfaces, fisheye distortion,
+bird's eye view, overexposed highlights, missing window, wrong scale furniture, text, watermark,
+people.
+```
+
+**為什麼這樣寫**：輕奢的分寸在「金屬只做細邊」，所以寫 `slim brass edge trim`／`brushed brass with matte finish` 而不是 `gold`；石材加 `does not repeat` 直接擋掉貼圖重複。
+**常見翻車與修法**：中島高度畫成餐桌高 → 明寫 `island top at 88cm, bar stools with 65cm seat height`。
+
+---
+
+## C-07 廚房餐廳｜中世紀現代
+
+**需求**：餐廳區想走胡桃木＋芥黃，配一盞球型吊燈。
+
+```
+A photorealistic interior photograph of a dining area next to an open kitchen in a Taiwanese
+newly-completed apartment, about 6 ping, with an aluminium-framed window on the right and a
+210cm-high flush door behind, renovated ceiling height 250cm. Mid-century modern interior, walnut
+veneer, tapered wooden legs, warm balanced palette with mustard and olive accents. Floor is walnut
+wood flooring with visible grain; walls are warm white paint with a walnut slat feature wall
+behind the sideboard; the ceiling is flat white; a low walnut sideboard with cane webbing doors on
+tapered legs stands against the feature wall; a round walnut dining table 75cm high with four
+mid-century dining chairs, a mustard fabric seat cushion, a geometric patterned rug; a white globe
+pendant lamp 35cm in diameter hangs 75cm above the table top; a terrazzo top console holds a glass
+vase; kitchen cabinetry in the background is warm white with a terrazzo countertop 88cm high.
+Afternoon daylight from the right window, 3000K warm ambient lighting, warm balanced exposure,
+soft shadows. Shot on a 26mm equivalent wide-angle lens at eye level, camera height 120cm,
+one-point perspective, verticals kept straight, the entire table with all four chairs inside the
+frame. Photorealistic architectural interior photography, visible walnut grain, realistic cane
+webbing texture, terrazzo aggregate detail, sharp focus, highly detailed.
+AVOID: retro diner, 1950s cafe, oversized chunky legs, over saturated primary colours, plastic toy
+look, fireplace stone wall, sunken living room, fisheye distortion, bird's eye view, floating
+furniture, missing window, text, watermark, people.
+```
+
+**為什麼這樣寫**：中世紀現代靠「細錐腳＋圓桌＋球燈」三件事成立，全部寫進去；吊燈高度 75cm 與桌高 75cm 分開寫，避免燈掉到桌面上。
+**常見翻車與修法**：畫成美式復古餐館（紅皮卡座） → 加 `private residential dining area, not a restaurant` 並保留負面詞 `retro diner`。
+
+---
+
+## C-08 浴室｜工業風
+
+**需求**：主浴 1.5 坪，想要黑鐵＋水泥感，乾濕分離。
+
+```
+A photorealistic interior photograph of a small master bathroom in a Taiwanese newly-completed
+apartment, about 1.5 ping, with a black-framed glass shower partition separating the wet and dry
+areas, one small aluminium-framed window with frosted glass, and a 210cm-high door, ceiling height
+240cm. Industrial loft interior, concrete finish, black metal frame, matte black hardware, raw
+texture contrast. Floor is grey microcement-look porcelain tile with a linear floor drain; walls
+are board-formed concrete effect tile in the wet area and grey microcement paint in the dry area;
+the ceiling is a flat moisture-resistant panel in dark grey with recessed downlights; the vanity is
+a black steel frame with a solid wood top at 82cm holding a white ceramic vessel basin, a matte
+black wall-mounted mixer, and open black metal shelving with folded towels; a large frameless
+mirror with a slim black surround and a 4000K LED strip behind it for face-level task light. Warm amber accent lighting
+plus neutral 4000K downlights, moderate contrast with visible texture in the shadows, no pitch
+black areas. Shot on a 20mm equivalent wide-angle lens at eye level, camera height 120cm,
+one-point perspective, verticals kept straight, the vanity and the shower partition both fully
+inside the frame. Photorealistic architectural interior photography, realistic concrete texture,
+matte black metal, water droplets on the glass, sharp focus, highly detailed.
+AVOID: bar counter, cafe interior, warehouse storage, roller shutter door, pitch black room,
+repeated brick texture tiling, rusty dirty surfaces, bathtub in a tiny bathroom, fisheye
+distortion, bird's eye view, overexposed highlights, missing door, wrong scale fixtures, text,
+watermark, people.
+```
+
+**為什麼這樣寫**：浴室最小、最容易透視爆掉，所以用 20mm 並明寫「梳妝台與淋浴隔間都要完整入鏡」；洗手台高度用 82cm（落在 80–85cm 正典內）。
+**常見翻車與修法**：小浴室硬塞浴缸 → 負面詞已擋，若仍出現就補 `walk-in shower only, no bathtub`。消防或排煙相關要求若客戶問到，回「需確認」。
+
+---
+
+## C-09 玄關｜新中式
+
+**需求**：玄關 1 坪，要落塵區＋鞋櫃＋一點東方味。
+
+```
+A photorealistic interior photograph of an entrance foyer in a Taiwanese newly-completed
+apartment, about 1 ping, with the main entrance door on the right, a step-down entry tile zone
+just inside the door, and an opening leading to the living room ahead, ceiling height 245cm.
+Modern Chinese style interior, ink-wash mood, refined oriental, restrained ornament, symmetrical
+composition. Floor is dark grey stone-look tile in the entry zone changing to dark walnut wood
+flooring beyond the threshold; walls are rice-paper textured off-white paint; the ceiling is flat
+off-white with a concealed 3000K light slot washing the screen; a full-height black walnut veneer
+shoe cabinet with a lattice screen upper section runs along the left wall, with a floating open
+niche at 85cm holding a celadon ceramic vase and a key tray, and a warm LED strip under the niche;
+a slim wood-framed bench 45cm high sits beside it; a single vertical ink-wash painting without any
+text hangs on the facing wall. Warm accent lighting at 2700K with soft daylight spilling from the
+living room, one bright area and one quiet shadow area, calm and elegant. Shot on a 24mm
+equivalent wide-angle lens at eye level, camera height 120cm, one-point perspective, verticals
+kept straight, the whole cabinet wall inside the frame. Photorealistic architectural interior
+photography, visible walnut grain, realistic ceramic glaze, subtle paper texture, sharp focus,
+highly detailed.
+AVOID: chinese restaurant, temple interior, dragon phoenix carving, heavy red and gold, palace
+lantern, garbled chinese characters, any calligraphy text, costume drama set, fisheye distortion,
+bird's eye view, floating furniture, missing door, text, watermark, logo, people.
+```
+
+**為什麼這樣寫**：新中式一定會被模型加假漢字，所以正面寫 `ink-wash painting without any text`、負面同時擋 `garbled chinese characters` 與 `any calligraphy text`。落塵區與 85cm 置物凹槽是台灣玄關的標準動作。
+**常見翻車與修法**：格柵密到像牢籠 → 補 `lattice with wide 8cm spacing, only on the upper half of the cabinet`。
+
+---
+
+## C-10 書房｜美式鄉村
+
+**需求**：小書房兼客房，要書牆＋工作桌，溫馨一點。
+
+```
+A photorealistic interior photograph of a small study that doubles as a guest room in a Taiwanese
+apartment, about 3.5 ping, with one aluminium-framed window on the left and a 210cm-high door on
+the right, ceiling height 245cm. American farmhouse interior, shaker cabinets, painted millwork,
+cozy traditional, muted country palette. Floor is rustic oak wood flooring; walls are white board
+and batten wainscot to 100cm height with warm off-white paint above; the ceiling is flat white
+with a slim wood trim; a full-height sage green shaker-style bookcase with brushed nickel knobs
+covers the right wall; a solid wood desk 74cm high with a spindle-back wooden chair sits under the
+window with a brass desk lamp; a wall-mounted fold-down guest bed panel finished to match the
+bookcase; a plain wool rug, cotton curtains, framed botanical prints without text, ceramic jars on
+the open shelf. Warm afternoon daylight from the left window plus 2700K ambient light, even soft
+illumination, homely and inviting. Shot on a 24mm equivalent wide-angle lens at eye level, camera
+height 120cm, one-point perspective, verticals kept straight, the desk and the full bookcase wall
+inside the frame. Photorealistic architectural interior photography, visible paint brush texture
+on millwork, realistic wood grain, cotton fabric weave, sharp focus, highly detailed.
+AVOID: baroque carving, roman column, ornate gold frame, over saturated yellow, rustic barn
+exterior, fireplace with chimney, western saloon, cluttered antiques, fisheye distortion, bird's
+eye view, overexposed highlights, missing window, text on the artwork, watermark, people.
+```
+
+**為什麼這樣寫**：美式鄉村在台灣的落地做法是「線板只做在櫃門與半牆」，所以明寫 `board and batten wainscot to 100cm`＋`shaker-style bookcase`，而不是整室木構；掛畫寫 `without text` 避免亂字。
+**常見翻車與修法**：色調整體偏黃 → 加 `neutral white balance, no yellow colour cast`。
+
+---
+
+## C-11 小宅一室多用｜北歐風＋現代簡約混搭
+
+**需求**：15 坪小宅，客廳、餐廳、工作區要在同一空間，還要能收納。
+
+```
+A photorealistic interior photograph of a compact 15-ping open-plan apartment interior in Taiwan
+combining living, dining and a work corner in one space, with a full-height aluminium-framed
+sliding window on the far wall, a 210cm-high flush door on the left, and a beam across the ceiling
+concealed by a dropped soffit, renovated ceiling height 248cm. Scandinavian and modern minimalist
+mix, light oak, warm off-white, clean geometry, space-enhancing layout, uncluttered. Floor is light
+oak wood flooring running away from the camera to lengthen the room; walls are warm off-white matte
+paint; the ceiling is flat white with a 3000K cove slot along the soffit; one continuous
+full-height handleless light oak veneer storage wall runs from the entrance to the window, with a
+recessed TV niche in the middle, a 45cm-deep desk section at 74cm height forming the work corner,
+and closed doors elsewhere; a compact two-seat beige fabric sofa with 42cm seat height, a light
+oak extendable dining table 75cm high with two chairs that also serves as a work surface, and a
+window bench with hidden storage under the sliding window; main walkway kept at 90cm, everything
+kept low so sightlines stay open. Bright daylight from the far window, soft even shadows, low
+contrast, airy and visually enlarged. Shot on a 20mm equivalent wide-angle lens at eye level,
+camera height 120cm, one-point perspective looking towards the window, verticals kept straight,
+all three zones visible in one frame, nothing cropped. Photorealistic architectural interior
+photography, visible oak grain, realistic fabric wrinkles, sharp focus, highly detailed.
+AVOID: cluttered room, oversized furniture, partition walls chopping the space, dark colours,
+western fireplace, skylight, fisheye distortion despite the wide lens, bird's eye view,
+overexposed highlights, floating furniture, missing window, missing door, disappearing beam, text,
+watermark, people.
+```
+
+**為什麼這樣寫**：小宅要「一面牆解決所有收納」，所以把儲藏牆寫成一條連續量體並在其中挖 TV 與書桌；地板方向寫 `running away from the camera` 是視覺放大的實招。
+**常見翻車與修法**：20mm 常帶魚眼變形 → 負面已寫 `fisheye distortion despite the wide lens`，仍歪就退回 24mm 重出。
+
+---
+
+## C-12 招牌／文字渲染｜品牌調（含中文短詞）
+
+**需求**：做一張門市或接待區的形象圖，牆上要有「如菓」兩個字的木質招牌。
+
+```
+A photorealistic interior photograph of a small design studio reception area in Taiwan, about 4
+ping, with a 210cm-high glass entrance door on the right and an aluminium-framed window on the
+left, ceiling height 260cm. Warm natural material palette: light oak, warm off-white plaster walls,
+deep green accent. Floor is warm grey large-format matte porcelain tile; the feature wall behind
+the reception counter is warm off-white textured plaster; the reception counter is light oak veneer
+with a warm white solid surface top at 100cm; a deep green upholstered bench and a potted olive
+tree sit to the side. Mounted centred on the plaster wall is a single flat solid oak signboard,
+about 60cm wide and 24cm tall, with exactly two Traditional Chinese characters carved into it and
+nothing else: 如 on the left and 菓 on the right, evenly spaced, in a clean modern sans-serif
+form, the carved strokes finished in deep green. No other text, no letters, no numbers, no logo
+anywhere in the image. Soft daylight from the left window plus warm 3000K accent light grazing the
+signboard. Shot on a 35mm equivalent lens at eye level, camera height 120cm, one-point perspective
+facing the sign wall, verticals kept straight, the whole signboard fully inside the frame and
+sharply in focus. Photorealistic architectural interior photography, visible oak grain, crisp
+carved edges, realistic plaster texture, sharp focus, highly detailed.
+AVOID: garbled or invented Chinese characters, extra characters, mirrored or reversed characters,
+simplified Chinese, English words, numbers, watermark, brand logos, fisheye distortion, bird's eye
+view, overexposed highlights, people.
+```
+
+**為什麼這樣寫**：文字渲染要成功必須做三件事——寫出**確切字元**、寫出**字數**（exactly two characters）、寫出**每個字的位置**（左如右菓），並用 35mm 而非 24mm 讓招牌不被廣角拉歪（適用 20–28mm 的例外情境）。
+**常見翻車與修法**：中文字缺筆、多筆、鏡像或變成簡體 → **每張出圖後逐字放大校對**（一個字一個字比對筆畫），錯了就改用「先出無字空招牌 → 再用 mask 只修招牌區域重寫文字」；同一個字連錯兩輪，改成留白招牌後製上字，不要無限重骰。
+
+---
+
+# D. 多角度一致（同一案 4 機位）
+
+目標：同一個空間出 4 張不同角度，材質與家具必須看起來是同一間房。
+
+**方法：materials block 逐字重用，只改 camera block。**
+
+1. 先出第 1 張（主視角），確認材質與家具通過。
+2. 把該 prompt 的 `[SPACE &amp; SIZE]`、`[MATERIALS]`、`[LIGHTING]`、`[QUALITY]`、`[AVOID]` **一字不改複製**到第 2–4 張。
+3. **只改 `[CAMERA]` 這一段**，並加一句 `SAME ROOM as the previous image, same materials, same furniture, same lighting; only the camera position changes.`
+4. 若平台支援參考圖，把第 1 張當參考圖一起送（edit 端可帶多張，官方範例 4 張），一致性再提升一級。
+5. 有 Thinking 模式（Plus／Pro／Business／Enterprise）時，**一次把 4 個機位一起交給 Thinking 出批次**，它會做版面推理與批次一致性；Instant 模式逐張出比較容易漂移。
+
+**四機位標準組（住宅客餐廳）**
+
+| 編號 | camera block 寫法 |
+|---|---|
+| V1 主視角 | `24mm equivalent, eye level 120cm, one-point perspective from the entrance looking towards the window, the whole TV wall and sofa in frame` |
+| V2 反打 | `24mm equivalent, eye level 120cm, one-point perspective from the window looking back towards the entrance and the dining area` |
+| V3 角落兩點 | `26mm equivalent, eye level 120cm, two-point perspective from the left corner, showing the TV wall and the side wall meeting` |
+| V4 局部特寫 | `50mm equivalent, eye level 120cm, straight-on view of the TV wall niche and the cabinetry detail, shallow depth of field`（適用 20–28mm 的例外情境） |
+
+**一致性檢核（4 張都要過）**：地板材質與拼法一致｜牆色一致｜櫃體門片與把手形式一致｜沙發布料與顏色一致｜光線方向與色溫一致｜窗戶數量與位置一致。任一項不一致 → 只重出那一張，不要整組重骰。
+
+---
+
+# E. 修圖不重骰
+
+**核心句**：`Keep everything else exactly the same.` 每一次局部修改都必須帶上。
+
+**規則**
+1. **一次只改一項**。改地坪、改櫃體色、改燈具＝三次操作，不是一句話。
+2. **只描述要改的那一項**，不要重述整間房。重述＝模型重新解讀整張圖＝重骰。
+3. **有 mask 就用 mask**：mask PNG 與原圖**同尺寸**，**透明區＝要改的區域**，其餘不透明。mask 邊界貼著物件輪廓外 2–3 像素，太緊會出現接縫。
+4. **保持透視與光線**：改材質時加 `match the existing perspective, lighting direction and colour temperature exactly`。
+5. **改完立刻比對**：新舊兩張並排看窗、門、樑柱、天花線、家具位置有沒有偷偷變動。
+6. gpt-image-2 預設高保真（input_fidelity 不可調），照理應保留原圖細節；若仍整張變樣，代表 prompt 寫太長把整張圖重新描述了——縮短 prompt 再試。
+
+**常用修圖句型**
+
+| 要改什麼 | 句子 |
+|---|---|
+| 換地坪 | `Change only the floor to light oak herringbone wood flooring with visible grain, laid running away from the camera. Match the existing perspective and lighting. Keep everything else exactly the same.` |
+| 換櫃體顏色 | `Change only the colour of the built-in cabinetry to warm sage green matte lacquer, keeping the exact same cabinet shape, door divisions and handleless design. Keep everything else exactly the same.` |
+| 換燈具 | `Replace only the pendant lamp above the dining table with a matte black globe pendant 35cm in diameter, hung 75cm above the table top. Keep everything else exactly the same.` |
+| 調光線 | `Keep the entire scene identical and only change the lighting to warm 2700K evening ambience with the cove lighting on and the daylight reduced. Do not move any object.` |
+| 移除物件 | `Remove only the floor lamp in the left corner and fill the area with the existing wall and floor finishes. Keep everything else exactly the same.` |
+| 加物件 | `Add only one woven basket with a fiddle-leaf fig beside the right window, sitting on the floor with a correct contact shadow. Keep everything else exactly the same.` |
+
+---
+
+# F. 負面／禁止清單
+
+本段分兩組：**F-1** 通用禁止清單（模式一／三用，含俯視類禁令）；**F-2** 模式二專用禁止清單（平面圖→3D 等角圖用，不含俯視類禁令）。**模式二一律用 F-2，不得誤用 F-1**——F-1 的 `bird's eye view`／`top-down view`／`high angle looking down`／`tilted verticals` 等禁令是為平視效果圖寫的，模式二要的正是 45 度俯角等角視，兩者直接衝突，誤用會一邊要求等角、一邊禁止俯視，出圖必然失敗且原因難查。
+
+## F-1 通用禁止清單（模式一／三）
+
+每張圖的 AVOID 段**至少**帶這一整組，再加 04 檔該風格的負面詞。
+
+```
+AVOID: western fireplace, chimney, skylight (unless explicitly requested), foreign power outlets
+(UK or EU round-pin), radiators, basement stairs, exposed timber roof trusses, fisheye distortion,
+warped perspective, tilted verticals, bird's eye view, top-down view, high angle looking down,
+overexposed blown highlights, crushed pitch-black shadows, repeated tiling texture, obvious texture
+seams, floating furniture not touching the floor, incorrect contact shadows, missing door, missing
+window, disappearing beam, disappearing column, walls that do not meet the ceiling, wrong scale
+furniture, doors taller or shorter than 210cm, oversized television, extra random text, garbled
+letters or characters, watermark, signature, brand logo, people, human faces, pets, cluttered
+random objects, cartoon or illustration style, CGI plastic look
+```
+
+**逐項為什麼（模型的已知偏誤）**
+
+| 禁止項 | 為什麼要擋 |
+|---|---|
+| 西式壁爐 | 模型的室內訓練資料以歐美住宅為主，客廳幾乎必生壁爐；台灣住宅沒有 |
+| 天窗 | 公寓樓層不可能有天窗，模型常自行加來補光 |
+| 外國插座 | 英規三腳／歐規圓孔一出現，客戶一眼看出是假圖 |
+| 魚眼／變形 | 廣角提示常誘發桶狀變形，必須同時要求 `verticals kept straight` |
+| 鳥瞰／俯視 | 「看清楚整個空間」的需求容易被理解成俯瞰，破壞眼高 120cm 設定 |
+| 過曝 | 「明亮」「大採光」提示常導致窗邊整片死白，細節全失 |
+| 紋理重複 | 石材與磚牆最明顯，貼圖式重複一看就假 |
+| 家具漂浮 | 缺接地陰影，家具像貼上去的 |
+| 門窗消失 | 換風格時模型常把門或窗「順手」抹平 |
+| 樑柱消失 | 台灣新成屋一定有樑柱，被抹掉＝圖不能施作 |
+| 比例失真 | 沙發過大、門過矮、電視佔滿牆是最常見三種 |
+| 多餘文字 | 亂字、假 logo、看不懂的招牌，交客戶必被抓 |
+
+## F-2 模式二專用禁止清單（平面圖→3D 等角圖）
+
+每則模式二 prompt 的結尾都帶這一整組（與 08 檔 C-6 同一份，兩檔互為正本備援）：
+
+```
+AVOID: western fireplace, chimney, skylight, attic, interior staircase, foreign power outlets (UK or
+EU round-pin), radiators, text labels, dimension lines, room name text, watermark, added windows not
+drawn in the plan, merged rooms, split rooms, relocated walls, doors opening into walls, repeated
+tiling texture, obvious texture seams, floating furniture not touching the floor, wrong scale
+furniture, people, human faces, pets, cartoon or illustration style, CGI plastic look
+```
+
+**逐項為什麼（F-2 新增項，未出現在 F-1 者）**
+
+| 禁止項 | 為什麼要擋 |
+|---|---|
+| 室內樓梯 | 平面圖是單層平面，模型會誤以為是透天而補樓梯 |
+| 文字標籤、尺寸線、房間名文字 | 平面圖上的中文字最容易被原樣畫進成果圖，是模式二最常見的災情 |
+| 加窗（原圖沒有的） | AI 最愛替暗房補光，這是格局跑掉的頭號原因 |
+| 併房間、切房間、移牆 | 模型會為了畫面「合理」而重整格局 |
+| 門開在牆上 | 門洞位置沒鎖住時的典型錯誤 |
+
+其餘項目（壁爐／煙囪／天窗／閣樓／外國插座／暖氣片／紋理重複／家具漂浮比例失真／人物寵物／卡通塑膠感）理由與 F-1 同表一致，不重複列。
+
+---
+
+# G. 交付前自檢（每張圖都跑）
+
+1. 相機：眼高像 120cm 嗎？垂直線有沒有歪？有沒有魚眼？
+2. 尺度：門看起來 210cm 嗎？沙發座高、檯面高、走道寬合理嗎？
+3. 結構：窗、門、樑柱、天花線是否與需求（或原始照片）一致？
+4. 材質：是不是超過五種？有沒有明顯重複貼圖？
+5. 台灣感：有沒有偷渡壁爐、天窗、外國插座、暖氣片？
+6. 文字：畫面有沒有多餘文字？招牌任務是否**逐字校對過筆畫**？
+7. 誠實標註：概念圖必附「本圖為概念示意，格局為假設值，實際以現場丈量與圖說為準」；保格局換風格若有任一項跑掉，明講是哪一項，**不得宣稱格局保留**。
+8. 法規類（消防、無障礙、逃生）數字若無明確來源，一律回「需確認」，不寫進圖說也不寫進說明。
+
+---
+
+# H. 已驗證寫法（由 07 回寫）
+
+本區分兩塊：**H-1** 是 07_過關圖回寫紀錄表每 10 筆小結後回寫的實戰措辭庫（尚無回寫紀錄前留空）；**H-2** 是 2026-08-19 從報告①《提升 ChatGPT 室內設計生圖能力》第五節「16 條方法論」中，篩出屬於 **prompt 寫法**（非工具安裝、非成本追蹤、非資產管理）的條目，先行併入本檔當寫法庫的起手式。與本檔既有 A–G 段重複的條目（已落地者）只標「已落地」與對應段落，不重寫內容。
+
+## H-1 07 回寫措辭庫
+
+（尚無回寫紀錄）
+
+## H-2 報告①方法論萃取（prompt 寫法類，2026-08-19 併入）
+
+| # | 技巧 | 怎麼落到提示詞 | 出處 repo | 本檔對應 |
+|---|---|---|---|---|
+| 1 | 提示詞用五段式，不寫成一段散文 | 任務類型／主體描述／風格定義／技術參數／輸出規格五段各自獨立成句；同案換風格時只改第三段（風格），其餘不動，出圖差異才可歸因 | xianyu110/awesome-gptimage2；freestylefly/awesome-gpt-image-2 | A 段九個 block 已是同一精神的落地版，換風格只動 [STYLE] 與 [MATERIALS] 兩個 block |
+| 2 | 先講空間，再講畫面 | 先用文字把格局、動線、家具位置與朝向講清楚，再要求出圖；把「佈局」當獨立條件而非形容詞 | ZGCTroy/LayoutDiffusion；aminshabani/house_diffusion | 已落地：A 段 [SPACE &amp; SIZE]／[LAYOUT — KEEP] 固定排在 [LOCK] 之後、[STYLE] 之前，見 A-3 第 8 條 |
+| 3 | 能給參考圖就別從零生成 | 現場實景照當條件輸入，模型只負責換材質與陳設，不負責重新想像格局 | lllyasviel/ControlNet；Nutlope/roomGPT | 模式一之二 已落地（走 edit、不可用純文生圖冒充） |
+| 4 | 局部要改就用遮罩，別整張重生 | 只框出要改的區域送編輯端點，其餘畫素原封不動；整張重生會連客戶已點頭的部分一起改掉 | alasano/gpt-image-playground；ControlGenAI/MaterialFusion | 模式三 做法 A、E 段已落地 |
+| 5 | 材質詞要連光一起寫 | 「霧面橡木」單獨寫沒有用，要連同光從哪來、反射強弱一起描述；材質的說服力來自光而不是名詞 | ControlGenAI/MaterialFusion；astra-vision/MatSwap | 已落地：A-3 第 7 條，MATERIALS block 每項材質後面至少接一句光照描述（例如 `light oak flooring, catching soft daylight from the left window with visible grain highlights`），不得只寫材質名詞 |
+| 6 | 同一空間多視角，要鎖住不變量 | 提示詞用固定句段複述不可變元素（開窗位置、地坪材質、主色），每個視角只換鏡頭描述 | River-Zhang/ICEdit；hzxie/Awesome-3D-Scene-Generation | D 段「materials block 逐字重用，只改 camera block」已落地 |
+| 7 | 寫實感靠攝影語彙，不靠形容詞堆疊 | 鏡頭焦段、時間、光源方向、景深這類攝影參數，比「高級」「溫馨」這類形容詞更能穩定出圖品質 | ZeroLu/awesome-gpt-image；jamez-bondos/awesome-gpt4o-images | CAMERA／LIGHTING block 已用攝影語彙；**提醒**：STYLE block 出現「高級」「溫馨」這類詞時，優先換成對應的鏡頭／光源／景深描述 |
+| 13 | 用一段「不可違反」的主提示詞鎖住空間骨架 | 每則室內提示詞最前面固定放同一段話：牆體位置、開窗位置與大小、相機角度與鏡頭高度一律不得更動，只准更換材質、燈光與家具陳設；這段話不隨案子改寫，改的只有後面的風格段 | zyliu0/interior-design（補掃） | 已落地：A 主模板新增 `[LOCK]` block（九個 block 之首），定稿句逐字固定、每則 prompt 最前面都貼，對應 01 檔 §0 共用鐵則一 |
+| 14 | 改圖分三段講：先移除、再繪製、最後才是可選項 | 把改圖指令拆成「要移除什麼」「一定要畫成什麼」「哪些是可選的加分項」三段分別寫，混在一句會讓模型把可選項當必要項 | amir84ferdos/ComfyUI-ArchAi3d-Qwen（補掃） | 模式三、E 段目前是「一次只改一項」的單項句，尚未拆三段；**新規則**：局部修改若同時牽涉「拿掉舊物件＋放新物件＋可選裝飾」，一律拆成 REMOVE／DRAW／OPTIONAL 三行分寫，不混在一句 |
+| 15 | 材質先建分類表，再寫進提示詞 | 常用材質先依大類（石材／木皮／金屬／織品／塗裝）建成固定清單並統一命名，寫提示詞時直接引用清單名稱，不臨場想形容詞 | amir84ferdos/ComfyUI-ArchAi3d-Qwen（補掃） | 材質五大類命名框架見本檔 B-4（待補齊品項名稱），完整詞彙正本查 02 檔材質詞彙表 |
+
+未列入本表的第 8、9、10、11、12、16 條屬工具安裝／成本追蹤／資產管理／官方參數對帳類，不是 prompt 寫法，第 8、16 條的重點另收在下方 I 段，第 9–12 條收在內部 10_附錄（不上傳 ChatGPT）。
+
+---
+
+# I. 官方 prompting guide 要點（2026-08-19 併入）
+
+出處：報告①第五節第 8、16 條與六節「甲堆」，摘自 openai/openai-cookbook 官方生圖範例與 wuyoscar/GPT-Image2-Skill 的官方指南逐字備份（約 1,004 行）。本段只摘要點，不抄長文；兩者衝突一律以 openai-cookbook 官方原文為準，wuyoscar 備份僅作對照。
+
+1. **用攝影語言，不用情緒形容詞**：鏡頭焦段、光源方向、景深這類攝影參數，比「高級」「溫馨」更能穩定出圖（對應 H-2 第 7 條）。
+2. **四個獨立條件分開寫**：framing（框取範圍）、viewpoint（視點）、perspective（透視型式）、lighting mood（光線氛圍）各自成句，不要混進同一句形容詞裡——本檔 CAMERA／LIGHTING 兩個 block 已是這個精神的落地版。
+3. **明確要求真實質感**：布料皺褶、木紋、材質磨損這類詞要直接寫進 prompt，模型不會自動補上——對應本檔 QUALITY block。
+4. **清楚區分「該變」與「必須不變」**：官方指南把這點列為編輯任務的第一原則，對應本檔 `[LAYOUT — KEEP]` 與 `CHANGE ONLY` 兩段的寫法。
+5. **參數會實質改變出圖結果，不能只在文字上打轉**：quality（low/medium/high/auto）、size（16 的倍數、長寬比 1:3–3:1）、input_fidelity（高保真、不可調）、n（一次張數）每案至少對照官方參數表打勾一次；漏用參數比再改十版文字更常是翻車主因（H-2 第 16 條）。
+6. **五段式骨架是官方範例的共通寫法**：任務類型 → 主體描述 → 風格定義 → 技術參數 → 輸出規格，本檔 A 段九個 block 是這個骨架的室內設計加長版。
+
+---
+
+# J. 平面圖→3D 快速入口
+
+使用者上傳的是**平面圖／格局圖**，或需求是「變立體、看格局、全戶圖、等角圖」時，**不要用本檔 A/B/C 段的平視 prompt**——一律轉查 **08_知識檔_平面圖轉3D流程與prompt**。
+
+一句話流程：先用中文複述格局（房間數、相對位置、牆門窗位置、無法確定處）→ 使用者核對確認 → 確認後才用 08 檔的英文 prompt 出 45 度等角剖視圖，屋頂移除、牆高預設 2.8m。生圖前不生圖、複述未確認不得動筆，是模式二與模式一／三最大的差異。</code></pre>
+  </div>
+</details>
+
+<h3>5.2 <span class="pill">新增</span> 08 知識檔｜平面圖轉 3D：流程與 prompt</h3>
+<div class="card">
+  <p style="margin-top:0"><strong>用途</strong>：模式二的唯一正本。使用者上傳平面圖、或要求「變立體、看格局、全戶圖、等角圖、剖視圖」時一律照本檔執行。</p>
+  <p><strong>重點六項</strong></p>
+  <ul>
+    <li><strong>能力邊界先講清楚</strong>：出的是一張圖片，不是可旋轉可量測可匯出的 3D 模型；沒有工程級尺寸、不含水電結構消防資訊、不得作為施工估價請照依據。使用者說「我要 3D 模型」「要照著施工」時先講這段再動手。</li>
+    <li><strong>保格局三要件</strong>：原圖線條乾淨、提示詞逐項鎖住六項（外框／隔間／門洞／窗洞／房間數／相對比例）、生圖前先用文字複述一次格局並由使用者確認。缺一就會自行加窗、併房間、誤讀廚房線條——這不是機率問題，是已知行為。</li>
+    <li><strong>七步流程順序不可調換</strong>：其中第 3 步「先分析不生圖」是全流程最關鍵的關卡；第 7 步材質與光線一定排在格局確認之後，順序反了等於連格局一起重擲。</li>
+    <li><strong>五條可複製提示詞</strong>：P-1 一句話直出（試水溫）、P-2 兩段式保格局（對客戶出圖的預設做法）、P-3 迷你建築模型感全戶等角、P-4 參數化填空模板（工程溝通用，無家具、承重牆灰色、輕隔間白色）、P-5 官方骨幹句。每條附原版出處網址、適用情境、輸入要求與已知弱點。</li>
+    <li><strong>視角與多視角一致</strong>：三種視角規格與方位句寫法，多視角只換方位那一句（前左／前右／後方 45 度），其餘一字不動。</li>
+    <li><strong>交付附註逐字附上</strong>：每張成果圖下方附「本圖為依平面圖生成的立體示意圖，非 3D 模型……不得作為施工、估價或請照依據」，不得省略或改成更輕的說法；註記寫在訊息文字裡，不要壓在圖上。</li>
+  </ul>
+  <p class="note"><span class="pill warn">草稿標記</span> 五條提示詞皆為如菓自製改寫草稿、尚未實測，改寫時加了台灣住宅尺度（天花 2.8 公尺）、45 度等角剖視與屋頂移除的視角設定，並排除台灣住宅沒有的壁爐、天窗、閣樓、室內樓梯。另有一份網路流傳的自動化流程系統提示詞已明列為<strong>不得使用</strong>——其英文並非原始字串而是中文摘要重寫，來源藏在壓縮檔內無法覆核。</p>
+</div>
+<details>
+  <summary>展開：08 知識檔全文</summary>
+  <div class="det-body">
+<pre><code># 08 知識檔｜平面圖轉 3D：流程與 prompt（模式二專用）
+
+本檔用途：使用者上傳的是**平面圖／格局圖**，或要求「變立體、看格局、全戶圖、等角圖、剖視圖」時，一律照本檔執行。本檔是模式二的唯一正本。
+
+使用方式：先讀 A 段（能力邊界，決定要不要先跟使用者講清楚）→ 照 B 段七步走 → 從 C 段挑一條 prompt 貼用 → 用 D 段決定視角 → 交付前跑 E 段驗收 5 問 → 附上 H 段的交付附註句。
+
+分工路由（不要在本檔找這些）：
+- 模式一（效果圖／概念圖）與模式三（局部修改）的 prompt 與模板 → 查 **05 檔**。
+- 材質中英文名稱與質感寫法 → 查 **02 檔**。
+- 台灣住宅尺度、家具尺寸、鏡頭幾何 → 查 **03 檔**。
+- 十種風格的關鍵詞、色票 → 查 **04 檔**；負面詞不查 04（04 的「共用禁止清單」含俯視類禁令，與模式二衝突，模式二一律只用本檔 C-6 的 F-2）。
+- 參考圖（實景照／風格圖）用法 → 查 **06 檔**；上傳的是平面圖時就用本檔。
+
+---
+
+# A. 能力邊界：先講清楚，再動手
+
+出圖前若使用者說「我要 3D 模型」「要能旋轉」「要照著施工」，先用一句話說明本節 A2，再繼續。不要讓使用者誤以為拿到的是模型。
+
+## A1. 做得到
+- 把一張 2D 平面圖，變成一張**看起來立體**的等角俯視圖或剖視渲染圖，含家具、地板材質、光影，數十秒出圖。
+- 同一戶可換方位再出圖（前左／前右／後方 45 度），用於提案封面、客戶溝通、社群圖卡。
+- 格局確認後可繼續調材質與光線，且能與模式一的單房效果圖共用同一組材質描述。
+
+## A2. 做不到（要主動講）
+- 出的是**一張圖片**，不是可旋轉、可量測、可匯出的 3D 模型。
+- 沒有工程級尺寸；家具比例是視覺估計，不是實測。
+- 不含水電、結構、消防資訊。
+- 不得作為施工、估價或請照依據。
+
+## A3. 保格局的三要件（缺一就會出錯）
+1. **原圖線條乾淨**：正上方拍攝或建商電子檔，沒有尺寸線、圖例、浮水印等標註雜訊。
+2. **prompt 逐項鎖住**：外框／隔間／門洞／窗洞／房間數／相對比例，六項要一一寫出來，不能只寫 keep the layout。
+3. **生圖前先用文字複述一次格局**：由使用者確認無誤後才生圖。
+
+三者缺一，就會出現自行加窗、把兩間房併成一間、誤讀廚房線條等錯誤。這不是機率問題，是已知行為。
+
+## A4. 已知的自作主張（要預先擋掉）
+- 替沒有窗的暗房加窗（最常見）。
+- 把相鄰兩個小空間併成一間，或把一間切成兩間。
+- 誤讀廚房的檯面線、櫥櫃線，當成牆。
+- 把平面圖上的中文字（房間名、案名、尺寸標註）直接畫進成果圖。
+- 加入台灣住宅不會有的壁爐、天窗、閣樓、室內樓梯。
+- 天花板比例錯誤、窗戶開向錯置。
+
+---
+
+# B. 標準流程（七步，順序不可調換）
+
+順序反了的代價：先調材質再確認格局，等於連格局一起重擲，前面的核對全部作廢。
+
+## 第 1 步　準備平面圖（前處理）
+
+要求使用者提供的圖，逐項檢查：
+
+| 檢查項 | 要求 |
+|---|---|
+| 來源 | 建商電子檔優先；只有紙本才拍照 |
+| 拍攝 | 正上方拍攝、四角入鏡不歪斜。斜拍會變梯形，梯形會被當成真的格局。歪了重拍，不要用軟體硬拉 |
+| 清雜訊 | 刪掉尺寸線、標註、圖例、公司浮水印、案名、指北針以外的裝飾框 |
+| 保留 | 牆線、門洞、窗、房間名稱、比例尺（若有） |
+| 清晰度 | 牆線與門洞開口要看得出粗細差異；模糊到分不清門與窗，就要求重拍或重出檔 |
+| 個資 | **上傳前先遮蔽地址、屋主姓名、建案名稱、建商標章** |
+
+清圖有一條紅線：**寧可留一點雜訊，也不要把門洞或窗一併清掉**。清過頭比沒清更糟。
+
+若使用者給的是手繪或翻拍的髒圖、無法辨識，就直接說明「這張圖線條無法判讀，請補一張正上方拍攝或建商電子檔」，不要硬猜。
+
+## 第 2 步　標比例尺與主要尺寸
+
+沒有實際尺度，3 坪的浴室會被畫成飯店規格。請使用者補一句（照抄句）：
+
+&gt; 這是一戶台灣公寓，室內約 __ 坪（__ 平方公尺），天花板高 2.8 公尺，主臥約 __ × __ 公尺。
+
+使用者答不出來時：天花高預設 2.8 公尺（台灣 RC 公寓常見樓板高），並在回覆中標明「天花高採預設 2.8 公尺，需確認」。坪數與主臥尺寸未給就直接問，不要自行假設。
+
+## 第 3 步　先分析、不生圖（本流程最關鍵的關卡）
+
+上傳圖後的**第一則回覆不得出現任何圖片**。逐字送出下面這段中文 prompt（即 C 段 P-2 第一段）：
+
+```
+請先分析這張平面圖，不要生成圖片。請列出：
+1. 房間總數與各房間用途。
+2. 每個房間的相對位置。
+3. 牆面、門洞與窗戶位置。
+4. 你無法確定或線條含糊的地方。
+不要自行補上原圖沒有標示的門、窗、牆或房間。
+```
+
+### 複述應該長成的格式（照這個格式回，不要寫成散文）
+
+```
+一、房間總數與用途
+　共 6 個空間：客廳、餐廚、主臥、次臥 A、次臥 B、衛浴 ×2（主衛、客衛）。
+
+二、相對位置
+　入口在圖面下方（南側）；玄關進門左手為客衛，右手為餐廚。
+　客廳位於中央偏南，餐廚在客廳西側並相連。
+　主臥在圖面右上（東北），次臥 A 在左上（西北），次臥 B 在左下（西南）。
+　主衛附屬於主臥，開口朝主臥內側。
+
+三、牆面、門洞與窗戶
+　外牆開窗 4 處：客廳南向落地窗 1、主臥東向窗 1、次臥 A 北向窗 1、餐廚北向窗 1。
+　門洞 7 處：入戶門 1、房門 3、衛浴門 2、餐廚無門（開放）。
+　主臥與次臥 A 之間為一道連續隔間牆，中段無開口。
+　圖面中央偏北有一道短牆，兩側各接一支柱。
+
+四、無法確定的地方
+　1. 餐廚北側那條雙線，可能是窗也可能是櫥櫃立面線，需確認。
+　2. 次臥 B 西側靠外牆處有一小段折線，可能是收納櫃或包管，需確認。
+　3. 陽台與室內的分界線未標示落地門位置，需確認。
+```
+
+規則：
+- 第四項「無法確定的地方」**一定要有內容**。全部都確定＝沒有認真讀圖，重讀一次。
+- 不確定的地方一律列出來問，**不得自行補上原圖沒有的門、窗、牆或房間**。
+- 若圖面標示的房間名與用途矛盾（例如標「書房」但畫了衛浴設備），列進第四項，不要自己選一個。
+
+## 第 4 步　核對複述，錯了當場糾正
+
+把複述交給使用者逐條核對。使用者指正時的處理：只重列被指正的那幾項，不要整份重寫。
+
+糾正的句型（給使用者參考）：
+
+&gt; 錯了，餐廳在客廳**右側**不是左側；北面那道牆**沒有窗**。請重新列一次。
+
+**複述未被確認之前，不得生圖**。使用者若直接說「不用分析了，直接畫」，仍要回一句：「我先用文字列一次格局，30 秒，確認過再畫可以省掉重畫。」列完再畫。
+
+## 第 5 步　生圖（選版本）
+
+依用途從 C 段挑：
+
+| 用途 | 用哪一條 | 特徵 |
+|---|---|---|
+| 第一次試水溫、單一房間或簡單戶型 | **P-1** | 一句話直出、失敗成本低 |
+| 客戶提案（標準做法） | **P-2 第二段** | 有家具、暖材質、保格局措辭最完整 |
+| 提案封面、社群圖卡 | **P-3** | 迷你建築模型感、畫面乾淨無文字 |
+| 工地與工程溝通 | **P-4** | 無家具、標牆高、承重牆與輕隔間分色 |
+| 自製新 prompt 的地基 | **P-5** | 官方骨幹句，四行短版 |
+
+送出時開頭固定加一句：「依照剛才你確認的格局生成。」再貼英文 prompt。
+
+## 第 6 步　人眼把關，指名修
+
+把生成圖與原平面圖並排，照 E 段驗收 5 問逐項比對。發現錯誤要**指名修**，不要籠統說「格局不對」，也**不要整張重生**（重生等於重擲，會連對的地方一起換掉）。
+
+指名修的句型：
+
+&gt; 主臥和次臥之間的隔間牆不見了，請補回；南面陽台你多畫了一扇窗，原圖沒有，請移除。其他不要動。
+
+修完再跑一次驗收 5 問，逐項回答，不得籠統說「已修正」。
+
+## 第 7 步　補材質、出多視角、定稿
+
+格局全過之後才動材質與光線。順序反了會連格局一起重擲。
+
+&gt; 格局維持不變，只把地板換成淺橡木、牆面換成米白，其餘完全不動。
+
+多視角只換方位句（見 D 段），其餘 prompt 一字不動。定稿前再跑一次驗收 5 問。
+
+---
+
+# C. 五條可複製 prompt（如菓版）
+
+以下五條英文皆為**如菓自製改寫草稿、尚未實測**；每條下方附來源網址，方便回頭覆核。原版英文逐字內容不重複收錄於本檔，見報告②03 節（五條原版與如菓版逐字比對，5/5 exact match），本檔只收如菓版以免混用。改寫加了三件事：台灣住宅尺度（天花 2.8 公尺）、視角設定（45 度等角剖視、屋頂移除）、以及排除台灣住宅沒有的壁爐／天窗／閣樓／室內樓梯。
+
+實測通過後，才可以把「未實測」改成「已實測（日期）」。
+
+---
+
+## P-1　一句話直出：試水溫首選
+
+- **原版出處**：awesome-gpt4o-images — Example 20: Floorplan to 3D Rendering
+  https://github.com/jamez-bondos/awesome-gpt4o-images/blob/main/gpt-image-1/gpt-image-1-en.md
+- **適用情境**：第一次試、單一房間或簡單戶型、只要一張有氣氛的示意圖。
+- **輸入要求**：一張 2D 平面圖。來源標示的參數為 quality=high、size=1536×1024（走 API 的設定；網頁版直接上傳即可）。
+- **已知弱點**：示範以簡單戶型為主，複雜大戶型未見驗證；短句約束少，格局跑掉時沒有補救條款。複雜戶型請改用 P-2。
+
+**如菓版（自製草稿，未實測）**
+
+```
+Create a super realistic 3D rendering of this Taiwanese apartment floor plan. Do not change the
+positions of the walls; maintain all wall lines, door openings and window openings in the exact same
+position as they are in the plan. Ceiling height 2.8 m, typical Taiwan urban apartment scale. Show
+the unit as an isometric cutaway from a 45-degree top-down camera, roof removed. Add furniture,
+finishes, textures and depth. Do not add fireplaces, skylights, staircases, or any balcony or window
+that is not drawn in the plan.
+```
+
+---
+
+## P-2　兩段式保格局：對客戶出圖的標準做法（本檔核心）
+
+- **原版出處**：ChatGPT 2D 平面圖轉 3D 裝潢圖教學：Prompt 與限制
+  https://www.aiposthub.com/chatgpt-2d-floor-plan-to-3d-interior-render/
+- **適用情境**：要交給客戶看的全戶等角剖視圖，格局不能錯。**這是預設做法**，沒有特別指定就用這條。
+- **輸入要求**：建商電子檔或正上方拍攝的高清平面圖（避免梯形變形），牆線／門洞／房間名稱清楚；上傳前先遮蔽地址、姓名、建案名稱等個資；訊息裡補上坪數與天花高。
+- **已知弱點**：原文作者自己實測仍發生「AI 自行加窗、誤讀廚房線條」；產出仍是靜態圖，不是模型。所以第 6 步的人眼把關不能省。
+- **為何用它**：保格局措辭最完整——一次鎖住外框／隔間／門洞／窗洞／房間數／相對比例／動線，再用 add／remove／merge／rotate／mirror／relocate 六個動詞封死。
+
+**第一段（先分析、不生圖；中文逐字送出）**
+
+```
+請先分析這張平面圖，不要生成圖片。請列出：
+1. 房間總數與各房間用途。
+2. 每個房間的相對位置。
+3. 牆面、門洞與窗戶位置。
+4. 你無法確定或線條含糊的地方。
+不要自行補上原圖沒有標示的門、窗、牆或房間。
+```
+
+**第二段（確認無誤後才生圖）如菓版（自製草稿，未實測）**
+
+```
+Use the uploaded 2D floor plan as the authoritative geometry reference. This is a Taiwanese apartment
+unit; ceiling height is 2.8 m and the total floor area is about [__] m2. Convert it into a
+photorealistic 3D architectural cutaway render, roof removed, seen from a slightly tilted top-down
+isometric camera (about 45 degrees). Strictly preserve the exact outer footprint, wall geometry,
+internal partitions, door openings, window openings, room count, room positions, relative room
+proportions, and circulation shown in the input. Do not add, remove, merge, rotate, mirror, or
+relocate any room, wall, door, or window. Do not add fireplaces, skylights, or attic spaces. Furnish
+each room according to its label at realistic Taiwanese residential scale. Use warm natural materials
+(light oak flooring, off-white walls) and realistic daylight from the drawn windows only.
+```
+
+`[__]` 填實際平方公尺（坪數 × 3.3058，四捨五入到整數）。使用者只給坪數就換算後填入，並在回覆中寫明換算後的數字。
+
+---
+
+## P-3　迷你建築模型感：全戶等角圖
+
+- **原版出處**：easy-peasy.ai — 3D Isometric Architectural Floor Plan Render
+  https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605
+- **適用情境**：提案封面、社群貼文主圖，要一張乾淨的全戶「建築模型」風格圖。
+- **輸入要求**：整層平面圖，建議先移除文字標籤（prompt 內雖然已寫 Remove all text labels，圖面先清乾淨更保險）。
+- **已知弱點**：原頁範例並非以 ChatGPT 產出，且只有單張範例、無法驗證格局保真度。用它出圖仍要跑驗收 5 問。
+- **為何用它**：`miniature architectural maquette`（迷你建築模型）這個定錨詞，比講 3D render 更能逼出乾淨的等角全戶模型感；內建 Remove all text labels，直接解掉「平面圖上的中文字被畫進圖裡」這個常見災情。
+
+**如菓版（自製草稿，未實測）**
+
+```
+Top-down, fully 3D isometric render of this entire Taiwanese apartment floor plan. Create a clean,
+highly detailed miniature architectural maquette with accurate room proportions and layout, matching
+the reference exactly. Wall height 2.8 m. Remove all text labels and dimension lines. Keep every wall,
+door opening, window opening, appliance and room in the position drawn; do not add fireplaces,
+skylights or rooms that are not in the plan. Furnish each room at realistic Taiwanese residential
+scale—sofas, beds, dining tables, wardrobes, lamps, plants, rugs, kitchen appliances—arranged
+realistically and in scale. Photorealistic materials (light oak flooring, porcelain tile, fabric,
+glass). Soft global lighting, subtle shadows, crisp edges.
+```
+
+---
+
+## P-4　參數化填空模板：工程溝通用
+
+- **原版出處**：Convert 2D Floor Plan to 3D in Seconds（2026-05-26）
+  https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html
+- **適用情境**：工地與工程溝通。要的是格局與牆體清楚，不是美圖。
+- **輸入要求**：清理過的 2D 平面圖（去掉註記與網格）、明確天花板高度。
+- **已知弱點**：來源頁無實際成果圖佐證；作者自承常見版面混亂、天花板比例錯誤、窗戶方向錯置。工程溝通版對格局的要求最嚴，一致率要求 100%（見 E2）。
+- **同骨架換角色**：同一份骨架換變數即可衍生設計師版（指定風格／家具／地板／牆色）、代銷版（強調亮度與家具配置）、翻新版（展示更新後配置）。只換變數，不換句構。
+
+**如菓版（自製草稿，未實測）**
+
+```
+Convert this 2D floor plan into an isometric 3D visualization. Show the structure without a roof to
+reveal the interior layout. Wall height is 2.8 meters (typical Taiwan RC apartment). Display all
+structural RC walls and columns in gray concrete texture; show light-gauge partition walls in white.
+Include door swings and window placements exactly as shown, and do not add any door, window, skylight
+or fireplace that is not drawn. View from the [front-left / front-right / rear] corner at 45 degrees.
+Use a technical architectural style with neutral colors. No furniture. No decorative elements. Label
+nothing.
+```
+
+方括號三選一，其餘不動。
+
+---
+
+## P-5　官方骨幹句：自製 prompt 的地基
+
+- **原版出處**：OpenAI Cookbook — image-gen-models-prompting-guide（section 5.3）
+  https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image-gen-models-prompting-guide.ipynb
+- **適用情境**：所有自製 prompt 的骨幹；也適用手繪草圖轉寫實圖。
+- **輸入要求**：任意草圖或平面圖。
+- **已知弱點**：**該 notebook 全文從未提平面圖**，是通用草圖轉圖；套用到平面圖屬合理外推，不是官方對平面圖的背書。單獨使用時約束偏少，複雜戶型仍以 P-2 為準。
+- **為何用它**：官方認可的「保留佈局」標準句式，最後一句 Do not add new elements or text 直接對治 AI 亂加門窗與亂寫字。
+
+**如菓版（自製草稿，未實測）**
+
+```
+Turn this floor plan into a photorealistic isometric cutaway image of a Taiwanese apartment interior.
+Preserve the exact layout, wall positions, door and window openings, and relative proportions.
+Wall height 2.8 m; camera 45 degrees top-down; roof removed.
+Choose realistic materials and daylight consistent with the plan's window positions.
+Do not add new elements, rooms, fireplaces, skylights, or text.
+```
+
+---
+
+## C-6　模式二專用禁止清單（F-2）
+
+**模式二一律用本清單，不得沿用 05 檔的 F-1 通用清單，也不得套用 04 檔「四、共用禁止清單」。** F-1 與 04 的共用禁止清單都內含 bird's eye view／top-down view（04 另有 high angle looking down／tilted verticals 等俯視類禁令），那是為平視效果圖寫的；模式二要的正是 45 度俯角等角視，兩者直接衝突，誤用會一邊要求等角、一邊禁止俯視，出圖必然失敗且原因難查。04 檔的色票與材質詞仍可查，但負面詞一律不取 04、只用本節 F-2。
+
+每則模式二 prompt 的結尾都帶這一整組：
+
+```
+AVOID: western fireplace, chimney, skylight, attic, interior staircase, foreign power outlets (UK or
+EU round-pin), radiators, text labels, dimension lines, room name text, watermark, added windows not
+drawn in the plan, merged rooms, split rooms, relocated walls, doors opening into walls, repeated
+tiling texture, obvious texture seams, floating furniture not touching the floor, wrong scale
+furniture, people, human faces, pets, cartoon or illustration style, CGI plastic look
+```
+
+**逐項為什麼**
+
+| 禁止項 | 為什麼要擋 |
+|---|---|
+| 西式壁爐、煙囪 | 訓練資料以歐美住宅為主，客廳幾乎必生壁爐；台灣住宅沒有 |
+| 天窗、閣樓 | 公寓樓層不可能有，模型常自行加來補光或填空 |
+| 室內樓梯 | 平面圖是單層平面，模型會誤以為是透天而補樓梯 |
+| 外國插座、暖氣片 | 一出現就一眼看出是假圖 |
+| 文字標籤、尺寸線、房間名文字 | 平面圖上的中文字最容易被原樣畫進成果圖，是模式二最常見的災情 |
+| 浮水印 | 建商圖檔的浮水印會被當成圖案畫進去 |
+| 加窗（原圖沒有的） | AI 最愛替暗房補光，這是格局跑掉的頭號原因 |
+| 併房間、切房間、移牆 | 模型會為了畫面「合理」而重整格局 |
+| 門開在牆上 | 門洞位置沒鎖住時的典型錯誤 |
+| 紋理重複、接縫 | 地板與磚牆最明顯，等角圖大面積地坪尤其容易露餡 |
+| 家具漂浮、比例失真 | 等角視最容易看出家具沒接地與比例錯誤 |
+| 人物、寵物 | 提案圖出現陌生人臉，客戶會分心也會質疑 |
+| 卡通感、塑膠感 | 模型感要來自 maquette 定錨詞，不是塑膠質感 |
+
+## C-7　不得使用
+
+網路上流傳的一份「floor-plan-3d-visualization（Pipedream 自動化）系統 prompt」不得採用。理由：其所謂英文原文其實是中文摘要重寫（引文裡夾著中括號中文註解），非原始字串，且來源內容藏在壓縮檔內、外部無法覆核，照抄無效。
+（該來源：https://github.com/vinjamurigowtham999-ops/floor-plan-3d-visualization ，列此僅供辨識，不供使用。）
+
+---
+
+# D. 視角規格與多視角一致
+
+## D1. 三種視角規格
+
+| 規格 | 英文定錨句 | 用途 | 屋頂 | 家具 |
+|---|---|---|---|---|
+| **等角俯視（預設）** | `slightly tilted top-down isometric camera, about 45 degrees` | 全戶格局溝通、客戶提案 | 移除 | 有 |
+| **娃娃屋剖視** | `photorealistic 3D architectural cutaway render, roof removed, walls cut at 2.8 m` | 要看到牆高與空間感，比等角更有立體厚度 | 移除 | 有 |
+| **單房透視特寫** | 見 F 段（銜接模式一） | 單一空間的氣氛與材質 | 不適用 | 有 |
+
+三者共通：**牆高一律 2.8 公尺**（除非使用者另給實際值）。模式二不套用模式一的眼高 120cm 與 24mm 焦段規定——那是平視效果圖的參數，等角圖不適用。
+
+工程溝通用 P-4 時，視角維持 45 度、不加家具、不加裝飾、不寫任何文字。
+
+## D2. 方位句（多視角只換這一句）
+
+```
+View from the front-left corner at 45 degrees.
+View from the front-right corner at 45 degrees.
+View from the rear at 45 degrees.
+```
+
+## D3. 多視角一致的三條規則
+
+1. **只換方位句，其餘 prompt 一字不動**。材質段、格局約束段、禁止清單全部逐字沿用。
+2. **不重新解讀平面圖**。換視角時不要回到第 3 步重新複述格局，也不要重新上傳平面圖——那等於重擲。
+3. **每一張都要重跑驗收 5 問**，不得只驗第一張。換視角是格局最容易漂移的時刻。
+
+多視角出現不一致時：以已通過驗收的那張為基準，指名修不一致的那張（「這張的餐廚位置和前一張不同，餐廚應在客廳西側，請修正，其他不要動」），不要三張全部重生。
+
+一次提案建議最多四張：全戶等角 1 張＋換方位 1 張＋主要空間透視 2 張。超過四張，一致性的維護成本會高於效益。
+
+---
+
+# E. 驗收與失敗修法
+
+## E1. 驗收 5 問（每張圖交出去前都問一次，逐項作答）
+
+1. **房間數對嗎？** 原圖幾間房、幾套衛浴，圖上就要是幾間，沒有被併也沒有被多切。
+2. **隔間牆位置與相對比例對嗎？** 客廳與餐廳誰大誰小、主臥在哪一側，與原圖一致。
+3. **門洞與開啟方向對嗎？** 有沒有憑空多一道門，或把門開在承重牆上。
+4. **窗戶只出現在原圖有窗的位置嗎？** 這是最常見的錯誤，AI 很愛替暗房加窗。
+5. **有沒有台灣住宅不會有的東西？** 壁爐、天窗、閣樓、室內樓梯——有就是自己加的，必須移除。
+
+**五問全過才算完成。任一不過，回到第 6 步指名修，不要整張重生。**
+
+回答格式（不得只寫「已通過」）：
+
+```
+驗收 5 問
+1 房間數：6/6 通過（3 房 2 衛 + 客餐廚）
+2 隔間與比例：通過（主臥在東北、客廳居中，與原圖一致）
+3 門洞與開向：通過（7 處門洞全對，開向與原圖一致）
+4 窗戶：不通過——次臥 B 西側多一扇窗，原圖無 → 已指名移除，見下一張
+5 多餘物件：通過（無壁爐、天窗、閣樓、室內樓梯）
+```
+
+## E2. 牆／門／窗一致率檢核方法
+
+驗收 5 問是「有沒有錯」，一致率是「錯多少」，用於判斷這張圖是修得回來還是該換做法。
+
+**算法**：
+- 分母＝原平面圖上的「隔間牆段數 ＋ 門洞數 ＋ 窗洞數」總和。牆段以兩個轉角之間為一段計。
+- 分子＝在成果圖上位置正確、數量正確的項數。多畫的項目要從分子扣（多一扇窗＝該窗不計入分子，且視為一個錯項）。
+- 一致率＝分子 ÷ 分母 × 100%，逐個點名數，不得目測估計。
+
+**判準**：
+- 客戶提案版（P-2、P-3）：一致率 **≥ 90%** 且驗收 5 問全過才可交付。
+- 工程溝通版（P-4）：一致率必須 **100%**，任何一項不對都要修到對。
+- 一致率 &lt; 90%：不要在同一張上修第三輪。回到第 3 步重新確認複述，或改用 P-2（若原本用 P-1）。
+- 同一張圖指名修 **2 輪仍未通過**：停手，改走 G 段的白模路線，或縮小範圍（先出單一樓層區塊而非全戶）。
+
+**點名記錄範例**：
+
+```
+分母 21（隔間牆 10 段 + 門洞 7 + 窗洞 4）
+錯項 2（次臥 B 多一窗；主臥與次臥 A 之間隔間牆消失）
+一致率 19/21 = 90.5% → 達標，但兩項均須指名修後再交付
+```
+
+## E3. 常見失敗與修法表
+
+| 症狀 | 修法（指名修，其他不要動） |
+|---|---|
+| 格局整體跑掉、房間位置錯亂 | 不要在圖上修。回第 3 步重新複述格局，確認後改用 P-2 第二段重出 |
+| 自行加窗 | 補一句 `Windows only where drawn in the plan; no additional openings.` 並指名：「南面陽台多了一扇窗，原圖沒有，請移除，其他不要動」 |
+| 房間被合併 | 指名該處：「餐廚與客廳之間原圖有一道隔間牆，請補回，維持兩個獨立空間，其他不要動」 |
+| 房間被多切 | 指名：「主臥被切成兩間，原圖是一間，請併回，其他不要動」 |
+| 誤讀廚房線條（把櫥櫃當牆） | 回第 3 步就該攔下。已出圖則指名：「廚房北側那條線是櫥櫃立面不是牆，請改成櫥櫃，其他不要動」 |
+| 比例失真（浴室過大、房間等寬） | 補實際尺寸再重出：「主臥約 4.2 × 3.3 公尺，衛浴約 1.6 × 2.0 公尺，請依此比例重出，格局不變」 |
+| 文字標籤殘留（中文字被畫進圖） | 補 `Remove all text labels and dimension lines. Label nothing.`；若仍殘留，回第 1 步把圖面文字清乾淨再重來 |
+| 天花板比例錯誤（牆看起來過高或過矮） | 補 `Wall height is exactly 2.8 meters; keep wall height consistent across all rooms.` |
+| 窗戶方向錯置（窗開在錯的外牆） | 指名方位：「東向窗應在主臥，不是次臥 A；請對調，其他不要動」 |
+| 多視角之間格局漂移 | 以已通過的那張為基準指名修不一致者；不要三張全部重生（見 D3） |
+| 多了壁爐／天窗／閣樓／室內樓梯 | 指名移除，並確認 prompt 結尾帶了 C-6 的禁止清單 |
+| 出成平視室內效果圖（不是等角） | prompt 的視角句被稀釋了。把 `slightly tilted top-down isometric camera, about 45 degrees, roof removed` 移到句子前段重出 |
+
+---
+
+# F. 與模式一銜接：等角圖定案後出單房效果圖
+
+全戶等角圖通過驗收 5 問之後，同一戶要出單一空間的透視效果圖，走**模式一**，但**沿用模式二已定案的材質段**，這是同一戶多張圖看起來像同一戶的關鍵。
+
+## F1. 銜接三步
+
+1. **抄出材質段**：把等角圖 prompt 裡的材質描述（地坪／牆面／櫃體／織品）與光線描述整段抄下來，逐字不改，存成這一案的「案子固定描述」。
+2. **換掉視角段**：刪除 `isometric / top-down / roof removed / 45 degrees` 整段，換成模式一的平視鏡頭段——眼高 120cm、24mm 等效（局部特寫可 35–50mm）、一點透視為主、垂直線保持垂直。
+3. **換掉禁止清單**：模式一改用 05 檔的 **F-1 通用清單**（含俯視類禁令），不再用 C-6 的 F-2。
+
+## F2. 單房透視的鏡頭措辭
+
+```
+Photorealistic interior photograph, 24 mm equivalent wide-angle lens, eye level at 120 cm, one-point
+perspective, verticals kept straight, warm afternoon daylight from the window drawn in the plan.
+```
+
+35–50mm 僅限局部特寫與文字／招牌渲染（見 01 §4、03 檔第 91 行），整間空間的透視一律 24mm（20–28mm 內可調）。原出處使用的是 35mm 鏡頭措辭，如菓版已依正典改為 24mm；光線措辭取自 GPT-image 室內設計提示詞指南：https://boardspace.ai/gpt-image-prompt-guide/ ；細節查 03 檔與 05 檔。
+
+## F3. 銜接時的三條紀律
+
+- **格局仍以平面圖為準**：轉成模式一之後，牆位、窗位、門位仍不得更動。等角圖是格局的視覺確認，平面圖才是權威依據。
+- **材質段一字不改**：要調材質就回頭改「案子固定描述」，然後全套圖一起換，不要單張偷改。
+- **模式一的圖也要跑自檢**：跑 05 檔的模式一 6 問，不是模式二的 5 問。
+
+---
+
+# G. 另一條路線：白模先建、再上材質（簡述）
+
+當同一張平面圖照上述流程**連續兩次不過驗收**（複雜大戶型最常見），還有一條備援：先用外部平面圖工具把格局建成無材質的 3D 白模，截一張 45 度等角圖，再把白模截圖丟進來，**只要求上材質與打光、不准動幾何**。
+
+上材質時用 P-5 的骨幹句，並額外加一句：
+
+```
+Do not change any geometry. Only add materials, textures and lighting.
+```
+
+適用時機：格局複雜、客戶對格局精度要求高、且時間允許（工時明顯高於直接出圖，急件不適用）。
+
+限制與注意：
+- 這條串接目前**沒有實測紀錄**，屬合理推論，第一次用要當試辦。
+- 平面圖送任何第三方平台前，一律先遮蔽地址、屋主姓名、建案名稱。
+- 工具選擇、額度與比較，見如菓內部附錄《外部工具鏈與引擎比較》（該附錄不在本專案知識檔內，請向如菓內部索取）。
+
+---
+
+# H. 交付附註（每張模式二成果圖都要附）
+
+逐字附在圖片下方，不得省略、不得改寫成更輕的說法：
+
+&gt; 本圖為依平面圖生成的立體示意圖，非 3D 模型，不含水電、結構、消防資訊；尺寸為視覺估計，不得作為施工、估價或請照依據，實際以現場丈量與圖說為準。
+
+補充規則：
+- 對外圖（客戶、社群、提案封面）一律帶此註記。
+- 客戶追問「工班可以照這個施工嗎」「大概多少錢、做多久」：先重述本註記，價格與工期一律請客戶直接聯繫如菓，不給任何數字，也不下法規結論。
+- 圖面本身不要壓字幕或浮水印式註記，註記寫在訊息文字裡即可（壓在圖上會與 C-6 的「不得出現文字」衝突）。
+
+---
+
+# I. 回寫紀律
+
+每一張模式二成果圖，不論過關或失敗，都要記進 07 過關圖回寫紀錄表（模式欄填「二」），至少記：用了哪一條 prompt（P-1～P-5）、修了幾輪、一致率、驗收 5 問逐項結果、失敗原因。
+
+累積滿 10 筆做一次小結：反覆過關的措辭補進本檔對應條目、反覆失敗的措辭從本檔移除；五條如菓版 prompt 實測通過後，把「自製草稿，未實測」改成「已實測（日期）」。沒有實測紀錄之前，這五條一律維持草稿標記，不得對外宣稱已驗證。</code></pre>
+  </div>
+</details>
+
+<h3>5.3 <span class="pill">修訂</span> 兩個小補丁：06 與 07 檔</h3>
+<p>這兩處是三模式路由能正確運作的前提，不是可做可不做的加分項，換裝時一併做完。</p>
+<div class="card">
+  <p style="margin-top:0"><strong>補丁 1／07 過關圖回寫紀錄表——表頭加「模式」欄</strong></p>
+  <p class="note">原表頭「日期｜案名/空間｜風格｜任務型…」整行取代成「日期｜案名/空間｜<strong>模式</strong>｜風格｜任務型…」；既有三筆範例列的模式欄各補填「一」（上線前的紀錄都算模式一）。這一欄之後要拿來統計模式誤判率，是判斷要不要拆專案的唯一量尺。</p>
+</div>
+<div class="card">
+  <p style="margin-top:0"><strong>補丁 2／06 參考圖使用手冊——參考圖三分類加第 4 類</strong></p>
+  <p class="note">在風格圖之後、「一次使用建議」之前補上「第 4 類 平面圖—格局權威依據」：唯一的格局權威來源，只取幾何（牆、門、窗、尺寸），忽略圖面上印的文字標籤、家具符號與註解；只在模式二啟動時上傳，且第一輪一律先複述、不生圖。</p>
+</div>
+
+<h3>5.4 <span class="pill">新增</span> 02／03／04 增補清單（人工待辦，不上傳）</h3>
+<p>兩份研究報告裡發現、現行三份正本尚未收錄但實測會用到的英文詞彙，先集中列成清單，人工貼進正本才會生效（助理讀不到這份清單）。分三組：</p>
+<ul>
+  <li><strong>視角／鏡頭幾何詞</strong>（等角剖視、軸測、45 度俯角相機、屋頂移除、迷你建築模型感、多視角方位句）——建議放進 03 檔而非 02／04，因為性質是鏡頭幾何不是材質或風格。<span class="pill warn">待圈選</span></li>
+  <li><strong>材質描述詞</strong>（五大類命名框架、材質詞連光一起寫的寫法規則、模式二工程溝通版專用的灰色混凝土與輕隔間白色）——放 02 檔。</li>
+  <li><strong>風格與畫面定位詞</strong>（攝影語彙優先的跨風格通用提醒放在十風格清單最前面；技術性建築風格中性色調另闢小節，不與十風格並列）——放 04 檔。</li>
+</ul>
+<p class="note">清單另列「暫不收錄」兩項：爆炸軸測圖等都市設計詞彙（與住宅室內案型不符）、以及與品牌調性衝突的「多彩現代家具」原句。</p>
+
+<h2 id="s6">6. 建置步驟</h2>
+<p class="note">現況：專案「如菓室內設計」已建好、舊版指令已貼過、02–07 六個知識檔已上傳、試跑過主臥奶油風成功。以下是升級到 v2 的操作，換裝本身抓 15–20 分鐘。</p>
+
+<h3>步驟一・換指令</h3>
+<ol class="steps">
+  <li>進 ChatGPT 左側「Projects」→「如菓室內設計」→ 專案設定裡的 Instructions 欄。</li>
+  <li>把欄位裡目前的全文<strong>整段刪除</strong>。</li>
+  <li>打開 01 檔，複製「▼ 以下整段貼進 Instructions ▼」那行<strong>之後</strong>的全部文字（本方案書第 4 節可直接展開複製），貼進 Instructions 欄。</li>
+  <li>用介面顯示的字數對一下，應落在 6,900 字元上下，離自訂上限 7,600 還有餘裕，存檔。</li>
+</ol>
+
+<h3>步驟二・換知識檔（檔名對照）</h3>
+<div class="soft">
+  <p style="margin-top:0"><span class="pill danger">最容易出錯的一步</span> 同名檔案重複上傳<strong>不會覆蓋舊檔</strong>，介面通常會把新檔命名成加括號序號的版本，新舊兩版同時留在專案裡、內容互相矛盾（尤其 05 檔：舊版負面清單有「禁止俯視」，與模式二直接打架）。所以必須<strong>先刪舊檔、再上傳新檔</strong>。</p>
+</div>
+<div class="tw">
+<table>
+  <thead><tr><th>順序</th><th>動作</th><th>檔案</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td>檢視 Files 區現有清單</td><td>應為 02、03、04、05、06、07 共六個檔</td></tr>
+    <tr><td class="num">2</td><td><strong>刪除</strong>舊檔</td><td>05_知識檔_prompt模板與範例.md（不放心可先在自己電腦上核對過新版再刪）</td></tr>
+    <tr><td class="num">3</td><td>確認清單裡已無舊 05 檔</td><td>—</td></tr>
+    <tr><td class="num">4</td><td><strong>上傳</strong>新檔（只需這兩份）</td><td>05_知識檔_prompt模板與範例_v2.md、08_知識檔_平面圖轉3D流程與prompt.md</td></tr>
+    <tr><td class="num">5</td><td>做完兩個小補丁後<strong>先刪再傳</strong></td><td>06_知識檔_參考圖使用手冊.md、07_過關圖回寫紀錄表.md</td></tr>
+    <tr><td class="num">6</td><td>不必重傳</td><td>02、03、04（內容未改；增補清單套用後才需要重傳）</td></tr>
+    <tr><td class="num">7</td><td>不要上傳</td><td>09 建置與驗收手冊、10 外部工具鏈附錄、02_04 增補清單（自用參考，上傳沒用還占額度）</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">若看到任何檔名帶括號序號，代表舊檔沒刪乾淨、兩份同名不同版都還在，回到第 2 步重刪一次（帶序號的通常是後上傳、內容才是新的，先確認哪份是新版再刪）。上傳完順手確認一次：04 檔的俯視類負面詞模式二一律不取，模式二只用 08 檔 C-6／05 檔 F-2 那份清單。</p>
+
+<h3>步驟三・確認能力與建風格庫</h3>
+<ol class="steps">
+  <li>確認專案的 Image generation 能力已開啟，沒開就不會生圖。</li>
+  <li>在專案裡開新對話，照 05 檔範例出第一種風格（例如北歐風）的概念圖，來回調到滿意（跑一次 6 問自檢都過）。</li>
+  <li>對滿意的那張說「把這張存為北歐風的風格參考」，跟著介面出現的選項走。</li>
+  <li>依序建好日式無印、現代簡約、奶油風、新中式，一次一種，每種都要真的滿意再存。</li>
+  <li>其餘五種風格等實際案子用到再建，不必現在一次做完。</li>
+</ol>
+
+<h3>步驟四・跑 10 條試跑驗收腳本</h3>
+<p>照第 7 節逐條跑，每條開新對話、貼原句、附對應附件。門檻：10 條至少 8 條符合預期，其中 T7、T8 兩條模式邊界案例<strong>必須全過</strong>。沒過門檻，先回頭修指令的模式路由段，不要動知識檔。</p>
+
+<h2 id="s7">7. 試跑驗收腳本 10 條</h2>
+<div class="tw">
+<table class="wide">
+  <thead><tr><th>代號</th><th>測什麼</th><th>輸入原句／附件</th><th>預期行為</th><th>驗收指標</th><th>沒過先修哪裡</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>T1</strong><br><span class="pill">模式一</span></td><td>純文生圖概念圖</td>
+      <td>「幫我出一張新成屋主臥的日式無印配圖，大概 5 坪」<br><span class="note">無附件</span></td>
+      <td>第一行標模式一；尺寸風格已給就不追問；出 3:2 一張，眼高 120cm／24mm／一點透視；附概念示意句；說明 5 行內＋3 個可調項</td>
+      <td>模式標示正確／無俯視角／門高與床邊走道比例合理／有附概念示意句／全程零價格零工期字樣</td>
+      <td>模式標示錯漏，查指令模式路由段是否被刪或壓縮；多問超過 3 題，查模式一工作流有沒有貼完整</td>
+    </tr>
+    <tr>
+      <td><strong>T2</strong><br><span class="pill">模式一</span></td><td>實景照保格局換風格</td>
+      <td>「這張客廳實景照換成北歐風，格局不要動」<br><span class="note">附客廳實景照</span></td>
+      <td>先列「不變／要換」兩行確認；提示詞同時有必須不變與要換兩段、逐項列名；走以圖改圖不走純文生圖；出圖後跑 6 問</td>
+      <td>窗／門／樑柱／天花線／主要牆面五項與原圖一致；自檢逐項回答不是籠統一句；有一項跑掉必須明講是哪一項</td>
+      <td>沒逐項列名，查 05 檔 v2 的空間骨架硬鎖段有沒有正確上傳；自檢籠統，查指令回覆格式段是否要求逐項</td>
+    </tr>
+    <tr>
+      <td><strong>T3</strong><br><span class="pill">模式二</span><br><span class="pill clay">核心</span></td><td>全戶等角圖</td>
+      <td>「這是我客戶的平面圖，幫我變成 3D 立體圖給他看」<br><span class="note">附建商平面圖</span></td>
+      <td>第一則<strong>不生圖</strong>，改用中文複述格局四項並要求補天花高與總坪數；確認後才出 45 度等角剖視、屋頂移除；跑驗收 5 問</td>
+      <td>第一則絕對沒有圖；複述有列出「無法確定的地方」；沒自行補上原圖沒有的門窗牆房間；成果圖附非 3D 模型聲明</td>
+      <td>第一則就出圖＝本次升級最重要的守門項失守，立刻檢查模式二工作流「先分析不生圖」那句是否還在，並確認 08 檔已上傳</td>
+    </tr>
+    <tr>
+      <td><strong>T4</strong><br><span class="pill">模式二</span></td><td>工程溝通版</td>
+      <td>「同一張平面圖，出一張給工班看的，不要家具，牆高標出來」<br><span class="note">附同一張平面圖</span></td>
+      <td>改用參數化填空模板；牆高 2.8m、結構牆柱灰色混凝土質感、輕隔間白色、門開啟方向照原圖、無家具無裝飾無標籤</td>
+      <td>畫面確實無家具無裝飾；承重牆與輕隔間有顏色區分；沒有畫上任何文字標籤或尺寸線；維持 45 度視角</td>
+      <td>還是有家具，查是否誤用了客戶提案版模板；畫面有文字標籤，查 F-2 清單的文字標籤與尺寸線兩項有沒有套用</td>
+    </tr>
+    <tr>
+      <td><strong>T5</strong><br><span class="pill">模式二</span></td><td>多視角一致</td>
+      <td>「剛剛那張，再出一個從右前方看的角度」<br><span class="note">無附件，延續同一對話</span></td>
+      <td>只更換方位句為前右 45 度，其餘提示詞一字不動；交付時重跑驗收 5 問</td>
+      <td>房間數與隔間位置與前一張一致；家具與材質沒有漂移；沒有重新複述格局或重新解讀平面圖</td>
+      <td>又重新複述一次格局屬多問，查指令「多張一致：只改鏡頭段其餘不動」有沒有被套用</td>
+    </tr>
+    <tr>
+      <td><strong>T6</strong><br><span class="pill">模式三</span></td><td>局部修改</td>
+      <td>「這張圖只把地板換成淺橡木，其他都不要動」<br><span class="note">附前一張成果圖</span></td>
+      <td>優先建議用遮罩（同尺寸、透明區＝要改區域），沒有就用單項文字句；只描述地板一項；必帶其餘完全不動與沿用原透視光向色溫</td>
+      <td>提示詞長度明顯短於整圖版；家具、牆面、燈光、鏡頭都沒變動；並排比對窗門樑柱天花線沒被偷改</td>
+      <td>改動範圍超出地板，查模式三工作流「一次只改一項」有沒有被誤解成整體重生</td>
+    </tr>
+    <tr>
+      <td><strong>T7</strong><br><span class="pill danger">必過</span></td><td>模式邊界誤觸</td>
+      <td>「幫我看一下這個客廳可以怎麼配家具」<br><span class="note">附客廳<strong>實景照</strong>（不是平面圖）</span></td>
+      <td>判為模式一，走平視眼高 120cm／24mm，不能因為出現「配家具、看格局」字眼就滑進模式二出俯視等角圖</td>
+      <td>模式標示為一；成果圖是平視；沒有出現鳥瞰或等角俯視；用的是 F-1 通用負面清單</td>
+      <td>沒過＝路由靠關鍵字判斷而非靠「附件是不是平面圖」，回頭改模式路由的判斷依據描述，並記為一次誤判</td>
+    </tr>
+    <tr>
+      <td><strong>T8</strong><br><span class="pill danger">必過</span></td><td>模式邊界誤觸・反向</td>
+      <td>「這張圖幫我出效果圖」<br><span class="note">附的其實是<strong>平面圖</strong></span></td>
+      <td>判為模式二，並主動說明「你給的是平面圖，我先走格局複述再出立體示意；若要站在室內看的效果圖，請補一張實景照或指定空間」</td>
+      <td>沒把平面圖當實景照直接生平視效果圖；沒把平面圖線條或房間名文字畫進成果圖；有主動釐清不是用猜的</td>
+      <td>先回修模式路由段，不要直接觸發拆專案；拆專案的誤判率門檻要用真實案子累積 10 次判斷來算，不是用這 2 條試跑案例</td>
+    </tr>
+    <tr>
+      <td><strong>T9</strong><br><span class="pill">模式二</span></td><td>失敗處理：格局跑掉</td>
+      <td>「主臥跟次臥中間那道牆不見了，南面陽台你多畫一扇窗」<br><span class="note">無附件，針對上一張成果圖</span></td>
+      <td>指名修那兩處（補回隔間牆、移除多畫的窗），明寫其他不動，不整張重生；修完重跑驗收 5 問並逐項回答</td>
+      <td>只針對指名兩處修改；其餘房間家具與材質沒變；沒有回到第一段重新複述；沒有籠統回「已重新生成」</td>
+      <td>整張重生，查 08 檔常見失敗與修法表是否有列這條、指令有沒有引導到「指名修不重生」</td>
+    </tr>
+    <tr>
+      <td><strong>T10</strong><br><span class="pill danger">高風險</span></td><td>邊界與紅線</td>
+      <td>「這個 3D 圖做出來，工班可以照著施工嗎？大概要多少錢、做多久？」<br><span class="note">無附件</span></td>
+      <td>三件事各自擋住：說明此圖為靜態示意非 3D 模型、不含水電結構消防資訊、不得作施工估價請照依據；價格與工期一律回請直接聯繫如菓；不下法規結論</td>
+      <td>回覆中零金額、零工期天數、零法規結論；語氣專業溫和不推銷；沒有把問題丟回使用者做選單式提問</td>
+      <td>出現任何數字或法規結論，查指令邊界段有沒有完整保留；這條沒過屬高風險項，優先修</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p class="note">過關門檻：10 條至少 8 條符合預期，T7、T8 必須全過。沒過門檻先回頭修指令的模式路由段，不要動知識檔。</p>
+
+<h2 id="s8">8. 可行性評估與建議</h2>
+<p>本節只評估「建置這件事」本身，八個項目逐項列可行性、成本類型、時間、人力、效益、風險與優先序。全部項目皆為時間成本，無新增付費項目。</p>
+
+<div class="tw">
+<table class="wide">
+  <thead><tr><th>優先序</th><th>建置項</th><th>可行性</th><th>成本類型</th><th>時間</th><th>人力</th><th>效益</th><th>風險</th></tr></thead>
+  <tbody>
+    <tr><td class="num"><strong>1</strong></td><td>換指令（三模式路由）</td><td>高，貼上即生效</td><td class="nw">時間成本</td><td class="num">與下兩項合計 15–20 分</td><td class="nw">一人</td><td>三模式自動判斷，模式二守門機制生效</td><td>貼漏段落會讓路由失效；字元數要對一次</td></tr>
+    <tr><td class="num"><strong>2</strong></td><td>換 05 檔（先刪再傳）</td><td>高</td><td class="nw">時間成本</td><td class="num">同上</td><td class="nw">一人</td><td>硬鎖段與 F-1／F-2 分流落地</td><td><strong>沒刪舊檔＝新舊兩版同時被讀，禁止俯視與等角圖直接打架</strong></td></tr>
+    <tr><td class="num"><strong>3</strong></td><td>上傳 08 檔（新增）</td><td>高</td><td class="nw">時間成本</td><td class="num">同上</td><td class="nw">一人</td><td>模式二有唯一正本可循</td><td>漏傳會讓 T3 直接失敗</td></tr>
+    <tr><td class="num"><strong>4</strong></td><td>06／07 兩個小補丁</td><td>高，各改一處</td><td class="nw">時間成本</td><td class="num">需確認（手冊未列）</td><td class="nw">一人</td><td>模式欄是誤判率統計的唯一量尺；平面圖有了正式分類</td><td>忘了先刪再傳，等於沒改</td></tr>
+    <tr><td class="num"><strong>5</strong></td><td>試跑 10 條驗收腳本</td><td>高，照腳本逐條跑</td><td class="nw">時間成本</td><td class="num">需確認（含出圖等待）</td><td class="nw">一人</td><td>上線前抓出路由與守門失效</td><td>沒跑就上線，等於拿客戶案子當測試</td></tr>
+    <tr><td class="num"><strong>6</strong></td><td>建 5 種風格庫</td><td>中高，需來回調圖</td><td class="nw">時間成本</td><td class="num">一次一種，需確認</td><td class="nw">一人</td><td>之後叫名字就套用，省掉每次重寫風格描述</td><td>存了不滿意的圖會一路沿用，寧可慢不要快</td></tr>
+    <tr><td class="num"><strong>7</strong></td><td>套用 02／03／04 增補清單</td><td>中，人工逐條貼</td><td class="nw">時間成本</td><td class="num">需確認</td><td class="nw">一人</td><td>新詞彙進正本才生效，助理讀不到清單本身</td><td>等角鏡頭詞的歸檔位置尚待圈選；貼完沒重傳等於本機改了、線上還是舊版</td></tr>
+    <tr><td class="num"><strong>8</strong></td><td>維護迴圈（回寫與重數字元）</td><td>高，但要長期做</td><td class="nw">時間成本</td><td class="num">每滿 10 筆一次</td><td class="nw">一人</td><td>草稿標記靠它拿掉；拆專案與否靠它判斷</td><td>不記錄＝五條提示詞永遠是未實測草稿，也永遠算不出誤判率</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>試辦步驟與停損</h3>
+<div class="card">
+  <p style="margin-top:0"><strong>試辦步驟</strong></p>
+  <ol style="margin-bottom:0">
+    <li>先做第 1–4 項換裝（一次做完，不要拆天做，避免半新半舊）。</li>
+    <li>當天跑完 10 條試跑腳本，過門檻才開始接真實案子。</li>
+    <li>建 5 種風格庫，一種一種來。</li>
+    <li>前三個真實案子照紀錄表逐筆記錄，模式欄照填。</li>
+    <li>滿 10 筆做第一次回寫，同時算一次模式誤判率。</li>
+  </ol>
+</div>
+<div class="card">
+  <p style="margin-top:0"><strong>停損條件</strong></p>
+  <ul style="margin-bottom:0">
+    <li>10 條試跑沒過門檻，且回修模式路由段兩次仍失敗 → 停止上線，回頭檢查是不是舊 05 檔沒刪乾淨或 08 檔漏傳。</li>
+    <li>真實案子每 10 次判斷誤判 2 次以上，或模式二連續兩案出成平視效果圖 → 觸發拆專案條件 (b)，改走兩專案架構。</li>
+    <li>指令連續兩次增修後仍超過 7,600 字元且無可再刪 → 觸發條件 (a)，同樣改走兩專案架構。</li>
+    <li>風格庫某一種調 3 輪仍不滿意 → 先跳過那種風格，不要把不滿意的圖存進去汙染後續所有案子。</li>
+  </ul>
+</div>
+
+<h2 id="s9">9. 延伸方案：外部工具鏈與引擎比較</h2>
+<p>以下五條線屬於<strong>本次建置之外</strong>的延伸選項，全部是短期試辦性質，不影響第 6 節的建置。附錄本身不上傳、不進知識檔，是決策參考。</p>
+
+<div class="tw">
+<table class="wide">
+  <thead><tr><th>線</th><th>一句話定位</th><th>可行性</th><th>成本類型</th><th>驗收指標</th><th>停損</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>A</strong></td><td>本機出圖工具箱的室內設計節點包：抄它的材質分類法與三段式改圖邏輯，<strong>不用它的引擎</strong></td><td>中</td>
+      <td>免費（完整流程檔需訂閱，不買）</td>
+      <td>整理出 40 組以上常用材質的中文統一命名；抽 5 組實測，外觀與命名相符 4 組以上</td>
+      <td>安裝影響現有本機管線，或免費部分被付費牆擋住拿不到清單，即刻停手，改由既有材質詞彙表自建</td>
+    </tr>
+    <tr>
+      <td><strong>B</strong></td><td>自架出圖操作台：遮罩局部改圖＋成本追蹤，解決「改圖牽動全圖」</td><td>中高</td>
+      <td>需自備介面金鑰，按官方用量計價</td>
+      <td>被改區域以外畫面維持不變（格局保真五項 5/5）；同案改圖輪數低於現行流程；每張圖都有可查的成本紀錄</td>
+      <td>組織驗證兩週內過不了，或生圖花費高於它省下的改圖工時價值，就收掉自架台回現行網頁流程</td>
+    </tr>
+    <tr>
+      <td><strong>C</strong></td><td>外部白模工具建乾淨幾何，再交 ChatGPT 上材質光影</td><td>中，<strong>串接本身無實測佐證</strong></td>
+      <td>各家自訂訂閱／免費額度不一</td>
+      <td>白模截圖版與直出版各出 3 張，格局保真五項逐張比較</td>
+      <td>白模版沒有顯著優於直出版（差距小於 1 分／5 分制）就到此為止；保留把髒平面圖洗成乾淨 2D 的前處理段（確有價值），放棄白模串接段</td>
+    </tr>
+    <tr>
+      <td><strong>D</strong></td><td>兩家生圖引擎並排比較：同一組室內提示詞各出圖、固定評分表打分</td><td>高</td>
+      <td>需自備兩邊金鑰，小量測試</td>
+      <td>張數跑完並有分數與成本紀錄；六項總分差距明確（1 分以上）或明確接近（0.5 分內）——兩種結果都算有結論</td>
+      <td>拖過 2 天沒跑完就縮成 1 個案場先出小結；差距在 0.5 分內就維持現用引擎，不再加測</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td><td>出圖後去瑕疵：去除特有的過度銳化與雜點</td><td>中，本機顯卡才快</td>
+      <td>免費／授權需先取得書面確認</td>
+      <td>線上示範先免費驗效果</td>
+      <td>授權未取得書面確認前不得進入客戶交付物</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="soft">
+  <p style="margin-top:0"><span class="pill danger">紅線一・授權</span> 有一款出圖後處理的包裝節點<strong>授權明文禁止商業使用</strong>；如菓的效果圖是客戶交付物、屬商業使用，<strong>一律不採用</strong>，無論多方便。另有四項工具授權未標示——未標示<strong>不等於</strong>可自由使用，商用前一律先取得書面確認，未確認前不進客戶交付物。凡要進客戶交付物的環節，只能用官方生圖介面本身、明確可商用授權的工具，或如菓自己整理改寫的方法論文字（分類架構、命名表、流程步驟），不直接複製他人專案的檔案內容。</p>
+  <p style="margin-bottom:0"><span class="pill danger">紅線二・資料外流</span> 案場平面圖與實景照含地址、屋主姓名、建案名，走任何第三方代理或雲端服務（含上表的自架平台、白模工具、外部引擎）前必須先遮蔽；第三方代理服務一律不進生產流程，僅供方法論試辦與比較測試使用。</p>
+</div>
+
+<h3>兩條不投入的路線</h3>
+<ul>
+  <li><strong>自動化串接＋官方公告類</strong>：兩個案例皆無成果圖佐證，串接門檻高於直接用網頁出圖，暫不投入。</li>
+  <li><strong>非官方管線的整批外部工具</strong>：全數未深讀原始碼與文件、無精度數據可查證，暫不建議整批採用；僅前處理段因有具體可執行步驟、且不涉及精度宣稱，例外列入短期試辦。</li>
+</ul>
+
+<h3>流程配套（不必另建系統）</h3>
+<p>研究報告提到的「提示詞優化／品質檢查／標籤與版本管理」三段配套，前兩段已內建在 08 檔七步流程與驗收 5 問裡，不必另建；第三段「標籤與版本管理」現階段用 07 紀錄表兼代（含案場、日期、版本序號），待單月出圖量大到追蹤困難（例如同案場改圖輪數常態超過 5 輪），再評估要不要引入專用工具。</p>
+
+<h2 id="s10">10. 附件下載</h2>
+<div class="tw">
+<table>
+  <thead><tr><th>檔案</th><th>內容</th><th>是否上傳 ChatGPT</th></tr></thead>
+  <tbody>
+    <tr><td><a href="./files/01_GPT指令_v2.md">01_GPT指令_v2.md</a></td><td>專案指令正本（貼進 Instructions 欄的全文）</td><td>指令欄，非知識檔</td></tr>
+    <tr><td><a href="./files/05_知識檔_prompt模板與範例_v2.md">05_知識檔_prompt模板與範例_v2.md</a></td><td>提示詞模板與 12 組範例（模式一／三）</td><td>是（先刪舊 05 再上傳）</td></tr>
+    <tr><td><a href="./files/08_知識檔_平面圖轉3D流程與prompt.md">08_知識檔_平面圖轉3D流程與prompt.md</a></td><td>平面圖轉 3D 的流程與五條提示詞（模式二唯一正本）</td><td>是（新增）</td></tr>
+    <tr><td><a href="./files/09_建置與驗收手冊.md">09_建置與驗收手冊.md</a></td><td>換裝步驟、三張流程卡、10 條試跑腳本、維護迴圈、常見問題、分享版精簡指令</td><td>否</td></tr>
+    <tr><td><a href="./files/10_附錄_外部工具鏈與引擎比較.md">10_附錄_外部工具鏈與引擎比較.md</a></td><td>五條延伸路線的試辦步驟、驗收指標、停損與授權紅線</td><td>否</td></tr>
+    <tr><td><a href="./files/02_04_增補清單.md">02_04_增補清單.md</a></td><td>02／03／04 三份正本的新增詞彙人工待辦清單</td><td>否</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">另有兩份不在附件、但換裝時要就地修改的既有檔案：06_知識檔_參考圖使用手冊.md（加第 4 類平面圖）、07_過關圖回寫紀錄表.md（表頭加模式欄），改法見第 5.3 節。</p>
+
+<footer>
+  <p><strong>資料截止</strong>：2026-08-19。本方案書依據 2026-08-19 兩份研究報告與同日產出的 01、05、08、09、10 與增補清單六份文件整理。</p>
+  <p><strong>免責與待確認</strong></p>
+  <ul>
+    <li>08 檔五條英文提示詞與 05 檔模板皆為<strong>如菓自製改寫草稿、尚未實測</strong>；實測滿 10 筆回寫前，不得對外宣稱已驗證。</li>
+    <li>本方案書不列任何金額、單價或費率；延伸方案涉及的訂閱與用量費用一律以官方當期價目為準，需確認。</li>
+    <li>時間欄標「需確認」者，是來源文件未定時間，非估算值。</li>
+    <li>模式二成果圖為依平面圖生成的立體示意圖，非 3D 模型，不含水電、結構、消防資訊；尺寸為視覺估計，不得作為施工、估價或請照依據，實際以現場丈量與圖說為準。</li>
+    <li>助理不報價、不談工期、不下法規結論；此為刻意設計的邊界，非故障。</li>
+    <li>等角剖視鏡頭詞要放進哪一份知識檔，目前是建議、尚未套用，待圈選後執行。</li>
+  </ul>
+</footer>
+
+</div>

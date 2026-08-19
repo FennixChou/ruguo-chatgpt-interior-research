@@ -1,1 +1,826 @@
-<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>製作中</title><style>body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:#F2ECDF;color:#22271F;display:grid;place-items:center;height:100vh;margin:0}p{text-align:center}a{color:#34573B}</style></head><body><p>報告製作中，完成後於此更新。<br><a href="../">回首頁</a></p></body></html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>讓 ChatGPT 把室內設計平面圖變成 3D 立體圖：方法、工具、Prompt 海底撈針研究（2026-08）</title>
+<style>
+:root{
+  --bg:#F2ECDF; --surface:#FCFAF4; --surface-2:#F7F1E6;
+  --ink:#22271F; --muted:#62665A; --line:#E4DCCB;
+  --primary:#34573B; --primary-strong:#274430;
+  --primary-soft:rgba(52,87,59,.10); --primary-line:rgba(52,87,59,.30);
+  --clay:#8F6234; --warn:#96611B; --danger:#AF4636;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15170F; --surface:#1E2016; --surface-2:#24271B;
+    --ink:#ECE9DE; --muted:#9D9B88; --line:#2F3123;
+    --primary:#9BC084; --primary-strong:#B4D49E;
+    --primary-soft:rgba(155,192,132,.14); --primary-line:rgba(155,192,132,.38);
+    --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15170F; --surface:#1E2016; --surface-2:#24271B;
+  --ink:#ECE9DE; --muted:#9D9B88; --line:#2F3123;
+  --primary:#9BC084; --primary-strong:#B4D49E;
+  --primary-soft:rgba(155,192,132,.14); --primary-line:rgba(155,192,132,.38);
+  --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI","Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+  font-size:16px; line-height:1.75; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:860px;margin:0 auto;padding:44px 22px;}
+h1{font-size:1.55rem;font-weight:600;line-height:1.5;margin:0 0 10px;}
+h2{font-size:1.15rem;font-weight:600;margin:44px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+h3{font-size:1rem;font-weight:600;margin:26px 0 8px;}
+h4{font-size:.95rem;font-weight:600;margin:16px 0 6px;}
+p{margin:0 0 12px;}
+a{color:var(--primary);text-decoration:none;border-bottom:1px solid var(--primary-line);}
+a:hover{color:var(--primary-strong);border-bottom-color:var(--primary);}
+.lede{color:var(--muted);font-size:.88rem;margin:0 0 4px;}
+.meta{color:var(--muted);font-size:.88rem;margin:0 0 30px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:0 0 16px;}
+.card > :first-child{margin-top:0;}
+.card > :last-child{margin-bottom:0;}
+.soft{background:var(--primary-soft);border:1px solid var(--primary-line);border-radius:10px;padding:18px 20px;margin:0 0 16px;}
+.soft > :first-child{margin-top:0;}
+.soft > :last-child{margin-bottom:0;}
+ul,ol{margin:0 0 12px;padding-left:1.35em;}
+li{margin:0 0 6px;}
+.pill{display:inline-block;font-size:.76rem;letter-spacing:.05em;padding:2px 10px;border-radius:999px;
+  background:var(--primary-soft);color:var(--primary);border:1px solid var(--primary-line);margin:0 6px 6px 0;
+  font-variant-numeric:tabular-nums;}
+.pill.clay{background:transparent;color:var(--clay);border-color:var(--clay);}
+.pill.warn{background:transparent;color:var(--warn);border-color:var(--warn);}
+.pill.danger{background:transparent;color:var(--danger);border-color:var(--danger);}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:0 0 18px;background:var(--surface);}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem;}
+th{background:var(--surface-2);color:var(--muted);font-size:.76rem;letter-spacing:.05em;font-weight:600;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+td.num,th.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;}
+pre{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+  overflow-x:auto;font-size:.85rem;line-height:1.65;margin:0 0 12px;
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;white-space:pre-wrap;word-break:break-word;}
+code{font-family:"Cascadia Mono",Consolas,"Courier New",monospace;font-size:.88em;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;}
+pre code{background:none;border:none;padding:0;}
+.kv{font-size:.9rem;margin:0 0 4px;}
+.kv b{font-weight:600;color:var(--muted);font-size:.8rem;letter-spacing:.04em;margin-right:6px;}
+.note{color:var(--muted);font-size:.88rem;}
+.warn-txt{color:var(--warn);}
+.danger-txt{color:var(--danger);}
+.sec-no{color:var(--primary);font-variant-numeric:tabular-nums;margin-right:8px;}
+.rank{display:inline-block;min-width:1.6em;color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;}
+.list-lite{list-style:none;padding-left:0;}
+.list-lite li{padding:10px 0;border-bottom:1px solid var(--line);font-size:.92rem;}
+.list-lite li:last-child{border-bottom:none;}
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem;}
+hr{border:none;border-top:1px solid var(--line);margin:26px 0;}
+@media (max-width:520px){
+  .wrap{padding:30px 16px;}
+  h1{font-size:1.35rem;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="lede">如菓室內裝修｜內部研究報告</p>
+<h1>讓 ChatGPT 把室內設計平面圖變成 3D 立體圖：方法、工具、Prompt 海底撈針研究（2026-08）</h1>
+<p class="meta">資料截止 2026-08-19｜掃描 86 筆來源、深讀 15 筆、抽驗覆核 19 項</p>
+
+<!-- 1 -->
+<h2><span class="sec-no">01</span>結論先行</h2>
+<div class="soft">
+<p><b>能做到：</b>把一張 2D 平面圖，變成一張「看起來立體」的等角俯視圖或剖視渲染圖，含家具、地板材質、光影，數十秒出圖。</p>
+<p><b>做不到：</b>出的是<b>一張圖片</b>，不是可旋轉、可量測、可匯出的 3D 模型；沒有工程級尺寸，家具比例是視覺估計，不含水電、結構、消防資訊。<b>保格局的可信度取決於</b>三件事——原圖線條是否乾淨（正上方拍攝、無標註雜訊）、prompt 有沒有逐項鎖住「外框／隔間／門洞／房間數／相對比例」、以及生圖前有沒有先讓 ChatGPT 用文字複述一次格局。三者缺一，AI 就會自己加窗、併房間、誤讀廚房線條。</p>
+<p><b>路線 A（ChatGPT 直出）：</b>最快、成本最低、可複製 prompt 最多，適合客戶溝通用示意圖，但格局保真度要靠人眼把關，不能當施工依據。</p>
+<p><b>路線 B（ChatGPT 當中介腦＋外部生圖）：</b>用 ChatGPT 讀圖產出結構化指令、再交給別的模型畫圖；本批兩個案例都沒有成果圖佐證，門檻高於直出、暫不值得投入。</p>
+<p><b>路線 C（純外部工具）：</b>Planner 5D／CubiCasa 這類工具才是真的產「可編輯 3D」，但準確度未經驗證且多為訂閱制；Coohom 查證後只出 2D 可編輯平面圖，不出 3D。</p>
+<p><b>最值得做的三件事：</b>①拿一張現有案場平面圖，照第 3 節第 1 條「一句話 prompt」試水溫，10 分鐘知道成不成。②把第 3 節第 2 條的「兩段式（先分析、後生圖）」定為對客戶出圖的標準流程。③把第 3 節第 4 條的填空模板存成如菓自用版，工程溝通用「無家具、標牆高」那版，客戶提案用「有家具、暖材質」那版。</p>
+<p class="note">詳細可行性評估見第 08 節。</p>
+</div>
+
+<!-- 2 -->
+<h2><span class="sec-no">02</span>研究方法與資料品質</h2>
+<p>本次以 7 個角度切入搜尋：官方模型文件、社群精選 prompt 集、教學部落格（中英）、社群平台實作分享（Threads／論壇）、開源程式庫、學術論文、商用工具官網。</p>
+<div class="tbl">
+<table>
+<thead><tr><th>階段</th><th class="num">數量</th><th>說明</th></tr></thead>
+<tbody>
+<tr><td>初步掃描</td><td class="num">86</td><td>7 個角度的搜尋結果去重後</td></tr>
+<tr><td>深讀建卡</td><td class="num">15</td><td>開頁逐項填卡（方法／prompt 原文／輸入需求／成果／可重現性／注意）</td></tr>
+<tr><td>覆核抽驗</td><td class="num">19</td><td>評分 7 分以上全查＋6 分群全查＋低分 8 項</td></tr>
+<tr><td>未深讀</td><td class="num">46</td><td>清單見第 9 節</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>覆核結論：第一版不通過，修正後才進報告</h3>
+<p>覆核發現三類問題，皆已在本報告修正：</p>
+<div class="card">
+<p><b class="warn-txt">問題一：prompt 原文被截斷或改寫，共 4 筆。</b></p>
+<ul>
+<li>bigprompthub：只留了一句片段當「完整 prompt」。<span class="note">已逐字補回。</span></li>
+<li>edrawmax：同頁有四版模板，只給了 1 版。<span class="note">已逐字補回。</span></li>
+<li>easy-peasy：掉了保格局的關鍵後半段（keep all walls, doors… properly placed）。<span class="note">已逐字補回。</span></li>
+<li>Pipedream 那筆：所謂「英文原文」其實是中文摘要重寫（引文裡夾著中括號中文註解）。<span class="danger-txt">不可信，已禁止進入第 3 節可複製 prompt 區。</span></li>
+</ul>
+</div>
+<div class="card">
+<p><b class="warn-txt">問題二：評分錯置，共 2 筆。</b></p>
+<ul>
+<li>bigprompthub 實際有完整模板＋兩張成果對照圖，且明指適用 ChatGPT，卻被誤判為「無範例圖」壓到 4 分 → <b>上修 7 分</b>。</li>
+<li>Coohom 查證後只出 2D 可編輯平面圖、根本不出 3D，6 分過高 → <b>降為 4 分</b>。</li>
+</ul>
+</div>
+<div class="card">
+<p><b class="warn-txt">問題三：日期欄整批填成抓取日 2026-08-19</b>，等於沒有時效資訊。已覆核者實際日期為：OpenAI gpt-image-2 公告 2026-04-21、edrawmax 2026-05-26、Home Assistant 論壇貼文 2025-04-01。其餘未經覆核者，本報告一律標「未覆核」而不填抓取日。</p>
+</div>
+
+<!-- 3 -->
+<h2><span class="sec-no">03</span>可複製的 Prompt（5 條，皆逐字覆核）</h2>
+<p class="note">以下 5 條的英文原文皆為來源頁逐字內容，已重開頁面覆核。每條附一條「如菓版改寫」——<b>那是本報告自製的草稿，尚未實測</b>，加上了台灣住宅尺度、視角設定、保牆門窗不變、以及排除台灣住宅沒有的壁爐／天窗等元素。</p>
+
+<h3><span class="rank">01</span>一句話直出：試水溫首選</h3>
+<div class="card">
+<p class="kv"><b>來源</b><a href="https://github.com/jamez-bondos/awesome-gpt4o-images/blob/main/gpt-image-1/gpt-image-1-en.md">awesome-gpt4o-images — Example 20: Floorplan to 3D Rendering</a></p>
+<pre><code>Create a super realistic 3d rendering of this architectural rendering.. Do not change the positions of the walls, and maintain lines in the same exact position as they are in the plan, but add furniture and finishes and textures and depth.</code></pre>
+<p class="kv"><b>適用情境</b>第一次試、單一房間或簡單戶型、要一張有氣氛的示意圖。</p>
+<p class="kv"><b>輸入要求</b>一張 2D 建築平面圖；來源標示參數為 gpt-image-1、quality=high、size=1536x1024。</p>
+<p class="kv"><b>已知弱點</b>示範以簡單戶型為主，複雜大戶型未見驗證；原文含兩個句點的筆誤（照抄不影響效果）；短句約束少，格局跑掉時沒有補救條款。</p>
+<p class="kv"><b>為何選它</b>全套資料裡唯一「逐字原文＋輸入輸出對照圖＋模型參數」三證齊全的一句話 prompt。短、好記、失敗成本低。</p>
+<h4>如菓版改寫（自製草稿，未實測）</h4>
+<pre><code>Create a super realistic 3D rendering of this Taiwanese apartment floor plan. Do not change the positions of the walls; maintain all wall lines, door openings and window openings in the exact same position as they are in the plan. Ceiling height 2.8 m, typical Taiwan urban apartment scale. Show the unit as an isometric cutaway from a 45-degree top-down camera, roof removed. Add furniture, finishes, textures and depth. Do not add fireplaces, skylights, staircases, or any balcony or window that is not drawn in the plan.</code></pre>
+</div>
+
+<h3><span class="rank">02</span>兩段式保格局：對客戶出圖的標準做法</h3>
+<div class="card">
+<p class="kv"><b>來源</b><a href="https://www.aiposthub.com/chatgpt-2d-floor-plan-to-3d-interior-render/">ChatGPT 2D 平面圖轉 3D 裝潢圖教學：Prompt 與限制</a></p>
+<p class="kv"><b>第一段（先分析、不生圖）</b></p>
+<pre><code>請先分析這張平面圖，不要生成圖片。請列出：
+1. 房間總數與各房間用途。
+2. 每個房間的相對位置。
+3. 牆面、門洞與窗戶位置。
+4. 你無法確定或線條含糊的地方。
+不要自行補上原圖沒有標示的門、窗、牆或房間。</code></pre>
+<p class="kv"><b>第二段（確認無誤後才生圖）</b></p>
+<pre><code>Use the uploaded 2D floor plan as the authoritative geometry reference. Convert it into a polished photorealistic 3D architectural cutaway floor-plan render. Show the entire home from a slightly tilted top-down isometric camera. Strictly preserve the exact outer footprint, wall geometry, internal partitions, door openings, room count, room positions, relative room proportions, and circulation shown in the input. Do not add, remove, merge, rotate, mirror, or relocate any room, wall, door, or window. Furnish each room according to its label. Use clean contemporary interior with warm natural materials and realistic professional lighting.</code></pre>
+<p class="kv"><b>適用情境</b>要交給客戶看的全戶等角剖視圖，格局不能錯。</p>
+<p class="kv"><b>輸入要求</b>建商電子檔或正上方拍攝的高清平面圖（避免梯形變形），牆線／門洞／房間名稱要清楚；上傳前先遮蔽地址、姓名、建案名稱等個資。</p>
+<p class="kv"><b>已知弱點</b>作者自己實測仍發生「AI 自行加窗、誤讀廚房線條」；產出仍是靜態圖，不是模型。</p>
+<p class="kv"><b>為何選它</b>保格局措辭最完整（一次鎖住外框／隔間／門洞／房間數／相對比例／動線，再用 add／remove／merge／rotate／mirror／relocate 六個動詞封死），而且是全套資料中唯一有作者實測失敗紀錄背書的做法。</p>
+<h4>如菓版改寫（自製草稿，未實測）</h4>
+<pre><code>Use the uploaded 2D floor plan as the authoritative geometry reference. This is a Taiwanese apartment unit; ceiling height is 2.8 m and the total floor area is about [__] m2. Convert it into a photorealistic 3D architectural cutaway render, roof removed, seen from a slightly tilted top-down isometric camera (about 45 degrees). Strictly preserve the exact outer footprint, wall geometry, internal partitions, door openings, window openings, room count, room positions, relative room proportions, and circulation shown in the input. Do not add, remove, merge, rotate, mirror, or relocate any room, wall, door, or window. Do not add fireplaces, skylights, or attic spaces. Furnish each room according to its label at realistic Taiwanese residential scale. Use warm natural materials (light oak flooring, off-white walls) and realistic daylight from the drawn windows only.</code></pre>
+</div>
+
+<h3><span class="rank">03</span>迷你建築模型感：全戶等角圖</h3>
+<div class="card">
+<p class="kv"><b>來源</b><a href="https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605">easy-peasy.ai — 3D Isometric Architectural Floor Plan Render</a></p>
+<pre><code>Top-down, fully 3D isometric render of the entire floor plan. Create a clean, highly detailed miniature architectural maquette with accurate room proportions and layout, matching the reference exactly. Remove all text labels. Keep all walls, doors, furnitures, appliances or rooms properly places. Use colorful, modern furniture and decorative objects in each room—sofas, beds, tables, cabinets, lamps, plants, rugs, appliances—arranged realistically and in scale. High-resolution, photorealistic materials (wood floors, tiles, fabrics, glass). Soft global lighting, subtle shadows, crisp edges. Professional, polished, high-quality output.</code></pre>
+<p class="kv"><b>適用情境</b>要一張乾淨的全戶「建築模型」風格圖，適合放提案封面或社群貼文。</p>
+<p class="kv"><b>輸入要求</b>整層平面圖，建議先移除文字標籤（prompt 內雖有 Remove all text labels，先清乾淨更保險）。</p>
+<p class="kv"><b>已知弱點</b>原頁用的是 Nano Banana Pro 不是 ChatGPT，且只有單張範例、無法驗證格局保真度；原文有兩處文法筆誤（furnitures、properly places），照抄即可。</p>
+<p class="kv"><b>為何選它</b>「maquette（建築模型）」這個定錨詞比講 3D render 更能逼出乾淨的等角全戶模型感；內建 Remove all text labels 直接解掉「平面圖上的中文字被畫進圖裡」這個常見災情。純文字約束沒有模型相依，可直接貼進 ChatGPT。</p>
+<h4>如菓版改寫（自製草稿，未實測）</h4>
+<pre><code>Top-down, fully 3D isometric render of this entire Taiwanese apartment floor plan. Create a clean, highly detailed miniature architectural maquette with accurate room proportions and layout, matching the reference exactly. Wall height 2.8 m. Remove all text labels and dimension lines. Keep every wall, door opening, window opening, appliance and room in the position drawn; do not add fireplaces, skylights or rooms that are not in the plan. Furnish each room at realistic Taiwanese residential scale—sofas, beds, dining tables, wardrobes, lamps, plants, rugs, kitchen appliances—arranged realistically and in scale. Photorealistic materials (light oak flooring, porcelain tile, fabric, glass). Soft global lighting, subtle shadows, crisp edges.</code></pre>
+</div>
+
+<h3><span class="rank">04</span>參數化填空模板：工程溝通用</h3>
+<div class="card">
+<p class="kv"><b>來源</b><a href="https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html">Convert 2D Floor Plan to 3D in Seconds with Nano Banana Pro</a>（2026-05-26）</p>
+<pre><code>Convert this 2D floor plan into an isometric 3D visualization. Show the structure without a roof to reveal the interior layout. Wall height is [2.7/3.0/3.5] meters. Display all load-bearing walls in [gray/concrete texture]. Include door swings and window placements exactly as shown. Use a technical architectural style with neutral colors. View from [front-left/front-right/rear] corner at 45 degrees. No furniture. No decorative elements.</code></pre>
+<p class="kv"><b>適用情境</b>工地／工程溝通，要的是格局與牆體清楚，不是美圖。同頁另有室內設計師版（指定風格／家具／地板／牆色）、代銷版（強調亮度與家具配置）、翻新版（展示更新後配置），四版共用同一骨架，換角色只換變數。</p>
+<p class="kv"><b>輸入要求</b>清理過的 2D 平面圖（去掉註記與網格）、明確天花板高度、具體風格描述。</p>
+<p class="kv"><b>已知弱點</b>來源用 Google Nano Banana Pro 不是 ChatGPT；頁面無實際成果圖佐證；作者自承常見版面混亂、天花板比例錯誤、窗戶方向錯置。</p>
+<p class="kv"><b>為何選它</b>唯一把牆高、承重牆表現、門開啟方向、視角方位＋45 度全部參數化的填空模板。</p>
+<h4>如菓版改寫（自製草稿，未實測）</h4>
+<pre><code>Convert this 2D floor plan into an isometric 3D visualization. Show the structure without a roof to reveal the interior layout. Wall height is 2.8 meters (typical Taiwan RC apartment). Display all structural RC walls and columns in gray concrete texture; show light-gauge partition walls in white. Include door swings and window placements exactly as shown, and do not add any door, window, skylight or fireplace that is not drawn. View from the [front-left / front-right / rear] corner at 45 degrees. Use a technical architectural style with neutral colors. No furniture. No decorative elements. Label nothing.</code></pre>
+</div>
+
+<h3><span class="rank">05</span>官方骨幹句：自製 prompt 的地基</h3>
+<div class="card">
+<p class="kv"><b>來源</b><a href="https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image-gen-models-prompting-guide.ipynb">OpenAI Cookbook — image-gen-models-prompting-guide（section 5.3）</a></p>
+<pre><code>Turn this drawing into a photorealistic image.
+Preserve the exact layout, proportions, and perspective.
+Choose realistic materials and lighting consistent with the sketch intent.
+Do not add new elements or text.</code></pre>
+<p class="kv"><b>適用情境</b>當所有自製 prompt 的骨幹；也適用手繪草圖轉寫實圖。呼叫 gpt-image-2。</p>
+<p class="kv"><b>輸入要求</b>任意草圖或平面圖；官方範例走 API 的 images.edit()，需 API 額度（不是免費網頁版）。</p>
+<p class="kv"><b>已知弱點</b><b>該 notebook 全文從未提平面圖</b>，是通用草圖轉圖；套用到平面圖屬合理外推，但不是官方對平面圖的背書。</p>
+<p class="kv"><b>為何選它</b>官方認可的「保留佈局」標準句式，最後一句 Do not add new elements or text 直接對治 AI 亂加門窗與亂寫字。</p>
+<h4>如菓版改寫（自製草稿，未實測）</h4>
+<pre><code>Turn this floor plan into a photorealistic isometric cutaway image of a Taiwanese apartment interior.
+Preserve the exact layout, wall positions, door and window openings, and relative proportions.
+Wall height 2.8 m; camera 45 degrees top-down; roof removed.
+Choose realistic materials and daylight consistent with the plan's window positions.
+Do not add new elements, rooms, fireplaces, skylights, or text.</code></pre>
+</div>
+
+<div class="soft">
+<p><b>不得使用：</b>Pipedream 那份「系統 prompt」。它是中文摘要重寫、非原始字串，且來源 repo 內容藏在壓縮檔內、外部無法覆核，照抄無效。</p>
+</div>
+
+<!-- 4 -->
+<h2><span class="sec-no">04</span>Top 10 精選</h2>
+
+<div class="card">
+<h4><span class="rank">01</span><a href="https://github.com/jamez-bondos/awesome-gpt4o-images/blob/main/gpt-image-1/gpt-image-1-en.md">Example 20: Floorplan to 3D Rendering</a></h4>
+<p><span class="pill">GitHub</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">8 分</span></p>
+<p class="kv"><b>方法</b>上傳平面圖給 gpt-image-1，用一句話要求保持牆線位置不變、加家具材質光影，一次生成。</p>
+<p class="kv"><b>成果</b>牆線位置保持、家具材質深度齊全的寫實 3D 渲染，repo 內附輸入輸出對照圖。</p>
+<p class="kv"><b>可重現</b>可——prompt 原文、模型、參數（quality=high、1536x1024）全都寫明。</p>
+<p class="kv"><b>注意</b>示範以簡單戶型為主，複雜大戶型未驗證；需付費額度。原卡所稱星數略有誇大，已修正。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">02</span><a href="https://www.aiposthub.com/chatgpt-2d-floor-plan-to-3d-interior-render/">ChatGPT 2D 平面圖轉 3D 裝潢圖教學：Prompt 與限制</a></h4>
+<p><span class="pill">部落格（中英）</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">7 分</span></p>
+<p class="kv"><b>方法</b>兩步驟：先要 ChatGPT 只分析不生圖、核對房間與牆門窗，確認後才用英文 prompt 鎖格局生成剖視渲染。</p>
+<p class="kv"><b>成果</b>斜俯視 3D 剖視渲染，含家具地板光影；仍是靜態圖不是模型。</p>
+<p class="kv"><b>可重現</b>可——兩段 prompt 皆有原文，且交代了上傳前的個資遮蔽與拍攝要求。</p>
+<p class="kv"><b>注意</b>作者實測仍出現自行加窗、誤讀廚房線條；無工程級精度，不含水電結構消防。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">03</span><a href="https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image-gen-models-prompting-guide.ipynb">OpenAI Cookbook：image-gen-models-prompting-guide</a></h4>
+<p><span class="pill">GitHub（官方）</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>官方 gpt-image-2 提示詞指南：構圖控制、sketch-to-render、室內單物件精準置換三組模式。</p>
+<p class="kv"><b>成果</b>技術指南非案例展示，無平面圖成果圖；但明確承諾 sketch-to-render 會「保留精確佈局、比例與透視」。</p>
+<p class="kv"><b>可重現</b>可——附 Python client.images.edit() 呼叫碼。</p>
+<p class="kv"><b>注意</b>全文未提平面圖，套用屬外推；走 API 非網頁版。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">04</span><a href="https://www.bigprompthub.com/convert-blueprint-to-render-prompt/">Pro Blueprint to Render Prompt for Architectural Precision</a></h4>
+<p><span class="pill">部落格</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">7 分</span><span class="pill warn">評分已上修</span></p>
+<p class="kv"><b>方法</b>「上半平面圖＋下半 3D 透視」分割畫面模板，填入風格／材質／相機焦段／燈光等變數。</p>
+<p class="kv"><b>成果</b>頁面附 2 張上藍圖下寫實渲染的對照成果圖，並明指適用 ChatGPT（GPT Image 2）與 Gemini。</p>
+<p class="kv"><b>可重現</b>可——完整模板在頁上，開頭 <code>Create a [Aspect_Ratio: "3:4"] split-screen architectural visualization…</code>，結尾負面約束 <code>…no distorted proportions.</code></p>
+<p class="kv"><b>注意</b>變數多需自行調校；成果圖為站方展示非第三方實測。原評 4 分係誤判為無範例圖，已上修 7 分。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">05</span><a href="https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html">Convert 2D Floor Plan to 3D in Seconds with Nano Banana Pro</a></h4>
+<p><span class="pill">部落格</span><span class="pill">2026-05-26</span><span class="pill clay">路線 C</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>用 Google Nano Banana Pro 轉等角 3D，依對象提供建築師／室內設計師／代銷／翻新四版填空模板。</p>
+<p class="kv"><b>成果</b>成功案例房間完整、走廊定位正確、比例恰當；但無實際成果圖佐證。</p>
+<p class="kv"><b>可重現</b>部分——四版模板逐字可取，但沒有圖可比對。</p>
+<p class="kv"><b>注意</b>非 ChatGPT；超出 500 free tokens 需付費；作者自承常見版面混亂、天花板比例錯誤、窗戶方向錯置。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">06</span><a href="https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605">3D Isometric Architectural Floor Plan Render</a></h4>
+<p><span class="pill">產品範例頁</span><span class="pill">日期未覆核</span><span class="pill clay">路線 C</span><span class="pill">4 分</span></p>
+<p class="kv"><b>方法</b>單句 prompt 把整層戶型圖轉成頂視全 3D 等角迷你建築模型，含彩色家具電器。</p>
+<p class="kv"><b>成果</b>精細模型感、專業拋光材質、柔和全局光；平台標示單張成本 2 積分。</p>
+<p class="kv"><b>可重現</b>可——prompt 原文完整（本報告已補回被截掉的後半段）。</p>
+<p class="kv"><b>注意</b>用 Nano Banana Pro 非 ChatGPT，須在該付費平台使用；僅單張範例，格局保真度無從驗證。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">07</span><a href="https://boardspace.ai/gpt-image-prompt-guide/">GPT-image-1.5 Prompt Guide for Interior Designers</a></h4>
+<p><span class="pill">部落格</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>針對室內設計師，提供「平面圖→等軸 3D」「平面圖→俯視 3D」「手繪草圖→寫實渲染」三組保留精確尺寸的 prompt 片段。</p>
+<p class="kv"><b>成果</b>分別呈現 45 度等軸（硬木地板／自然採光）、俯視 3D（中性材質柔光）、寫實室內攝影感（35mm／暖午光）。</p>
+<p class="kv"><b>可重現</b>可——片段可直接拼進自己的 prompt。</p>
+<p class="kv"><b>注意</b>頁面為摘要組譯非逐字原始排版；未附成果圖驗證；頁面 UI 含希伯來文。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">08</span><a href="https://www.threads.com/@reroomai/post/DXtdASwk_ko/">ReRoom：ChatGPT Image 2.0 三段式平面轉 3D 流程</a></h4>
+<p><span class="pill">Threads</span><span class="pill">日期未覆核</span><span class="pill clay">路線 A</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>三步驟逐段餵圖：① 平面圖上色 ② 轉 3D 立軸圖 ③ 立軸圖轉立面圖。</p>
+<p class="kv"><b>成果</b>貼文含 6 張成果示範圖；逐步疊代理論上比一次跳 3D 更能保留配置。</p>
+<p class="kv"><b>可重現</b>部分——只知階段名稱。</p>
+<p class="kv"><b>注意</b><b>未附 prompt 原文</b>，需自行摸索每階段用詞；商業帳號貼文帶產品推廣性質。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">09</span><a href="https://community.home-assistant.io/t/found-on-reddit-let-chatgpt-create-isometric-images-of-your-rooms/872207">Found on Reddit: Let ChatGPT create isometric images of your rooms</a></h4>
+<p><span class="pill">論壇</span><span class="pill">2025-04-01</span><span class="pill clay">路線 A</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>拿房間實拍照（要見兩面牆＋地板）轉等角 3D，生圖後用 Upscayl 放大 3 倍再裁切。</p>
+<p class="kv"><b>成果</b>精確重現構圖與室內細節（含牆上掛畫），可選擇性移除雜物；作者實際用於自家儀表板。</p>
+<p class="kv"><b>可重現</b>可——prompt 逐字可取。</p>
+<p class="kv"><b>注意</b>是「實拍照轉等角圖」不是平面圖轉 3D；且限定舊版 GPT-4o，一年多前的技巧、模型已換代。</p>
+</div>
+
+<div class="card">
+<h4><span class="rank">10</span><a href="https://github.com/ChaiAbs/primax-validator">primax-validator (PRiMAX)</a></h4>
+<p><span class="pill">GitHub</span><span class="pill">日期未覆核</span><span class="pill clay">路線 C</span><span class="pill">6 分</span></p>
+<p class="kv"><b>方法</b>上傳含平面圖 PDF＋參考渲染＋品牌指南的壓縮檔，先產 3 張 2.5D 傢俱化渲染由視覺模型評分選最佳，再轉成等角 3D 迴旋短片並截圖。</p>
+<p class="kv"><b>成果</b>README 附多張實際截圖，視覺完成度高；但比例／格局保真度未量化。</p>
+<p class="kv"><b>可重現</b>部分——流程清楚但需備齊多組付費金鑰。</p>
+<p class="kv"><b>注意</b>全程沒用 ChatGPT；價值在於「先產多版再自動選圖」這個把關思路可借用。</p>
+</div>
+
+<!-- 5 -->
+<h2><span class="sec-no">05</span>三條路線總表</h2>
+
+<h3>路線 A：ChatGPT 直出（7 筆）</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>來源</th><th>平台</th><th>日期</th><th>證據</th><th>可重現</th><th class="num">分數</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/jamez-bondos/awesome-gpt4o-images/blob/main/gpt-image-1/gpt-image-1-en.md">Example 20: Floorplan to 3D Rendering</a></td><td>GitHub</td><td>未覆核</td><td>prompt 原文＋參數＋輸入輸出對照圖</td><td>可</td><td class="num">8</td></tr>
+<tr><td><a href="https://www.aiposthub.com/chatgpt-2d-floor-plan-to-3d-interior-render/">ChatGPT 2D 平面圖轉 3D 裝潢圖教學</a></td><td>部落格</td><td>未覆核</td><td>教學文字含作者實測結果紀錄</td><td>可</td><td class="num">7</td></tr>
+<tr><td><a href="https://www.bigprompthub.com/convert-blueprint-to-render-prompt/">Pro Blueprint to Render Prompt</a></td><td>部落格</td><td>未覆核</td><td>完整模板＋2 張成果對照圖</td><td>可</td><td class="num">7</td></tr>
+<tr><td><a href="https://boardspace.ai/gpt-image-prompt-guide/">GPT-image-1.5 Prompt Guide for Interior Designers</a></td><td>部落格</td><td>未覆核</td><td>多組 prompt 片段，無成果圖</td><td>可</td><td class="num">6</td></tr>
+<tr><td><a href="https://www.threads.com/@reroomai/post/DXtdASwk_ko/">ReRoom 三段式平面轉 3D</a></td><td>Threads</td><td>未覆核</td><td>6 張示範圖，無 prompt 原文</td><td>部分</td><td class="num">6</td></tr>
+<tr><td><a href="https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image-gen-models-prompting-guide.ipynb">OpenAI Cookbook 提示詞指南</a></td><td>GitHub（官方）</td><td>未覆核</td><td>官方最佳實務＋呼叫程式碼</td><td>可</td><td class="num">6</td></tr>
+<tr><td><a href="https://community.home-assistant.io/t/found-on-reddit-let-chatgpt-create-isometric-images-of-your-rooms/872207">Let ChatGPT create isometric images of your rooms</a></td><td>論壇</td><td>2025-04-01</td><td>文字敘述＋實際應用案例</td><td>可</td><td class="num">6</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>路線 B：ChatGPT 當中介腦、外部模型生圖（2 筆）</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>來源</th><th>平台</th><th>日期</th><th>證據</th><th>可重現</th><th class="num">分數</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/vinjamurigowtham999-ops/floor-plan-3d-visualization">floor-plan-3d-visualization（Pipedream 自動化）</a></td><td>GitHub</td><td>未覆核</td><td>README＋7 支流程原始碼，無成果圖</td><td>部分</td><td class="num">6</td></tr>
+<tr><td><a href="https://community.openai.com/t/introducing-gpt-image-2-available-today-in-the-api-and-codex/1379479">Introducing gpt-image-2（官方公告）</a></td><td>官方論壇</td><td>2026-04-21</td><td>純文字公告，無平面圖案例</td><td>否</td><td class="num">2</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>路線 C：純外部工具／非 ChatGPT 管線（6 筆）</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>來源</th><th>平台</th><th>日期</th><th>證據</th><th>可重現</th><th class="num">分數</th></tr></thead>
+<tbody>
+<tr><td><a href="https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html">Convert 2D Floor Plan to 3D with Nano Banana Pro</a></td><td>部落格</td><td>2026-05-26</td><td>四組完整模板＋操作步驟，無成果圖</td><td>部分</td><td class="num">6</td></tr>
+<tr><td><a href="https://github.com/ChaiAbs/primax-validator">primax-validator (PRiMAX)</a></td><td>GitHub</td><td>未覆核</td><td>完整流程截圖（含成果圖與影片快照）</td><td>部分</td><td class="num">6</td></tr>
+<tr><td><a href="https://planner5d.com/ai/floor-plan-to-3d-model">Planner 5D Floor Plan to 3D Model Converter</a></td><td>官網</td><td>產品頁無版本日期</td><td>官網文字，無展示影片／截圖</td><td>可</td><td class="num">5</td></tr>
+<tr><td><a href="https://getfloorplan.com/">Getfloorplan</a></td><td>官網</td><td>未覆核</td><td>僅取得首頁一句說明</td><td>可</td><td class="num">5</td></tr>
+<tr><td><a href="https://www.coohom.com/case/ai-floor-planner">Coohom AI Floor Planner</a></td><td>官網</td><td>產品頁無版本日期</td><td>官網文字＋FAQ，無實測截圖</td><td>可</td><td class="num">4</td></tr>
+<tr><td><a href="https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605">easy-peasy.ai 等角平面渲染範例</a></td><td>產品頁</td><td>未覆核</td><td>單張成果圖＋prompt 原文</td><td>可</td><td class="num">4</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 6 -->
+<h2><span class="sec-no">06</span>工具對照：誰真的吃平面圖出 3D</h2>
+<p class="note">本表整併路線 C 深讀卡與掃描到的商用工具。免費額度以各官網標示為準，未標示者列「需確認」。</p>
+<div class="tbl">
+<table>
+<thead><tr><th>工具</th><th>吃平面圖出 3D？</th><th>免費額度</th><th>與 ChatGPT 怎麼搭</th></tr></thead>
+<tbody>
+<tr>
+<td><a href="https://planner5d.com/ai/floor-plan-to-3d-model">Planner 5D</a></td>
+<td>是——出<b>可編輯互動 3D 專案</b>（真 3D，非圖片）</td>
+<td>每人一次免費試用；官網標訂閱首年 5 折</td>
+<td>互補：吃 DWG／DXF，對現有 CAD 圖友善。用它建幾何、用 ChatGPT 出氣氛示意圖</td>
+</tr>
+<tr>
+<td><a href="https://www.cubi.casa/3d-floor-plans/">CubiCasa</a></td>
+<td>是——手機掃描空間出 3D，輸出 DWG／DAE／FBX／OBJ</td>
+<td>需確認</td>
+<td>互補：現場沒圖時用它掃出平面圖，再餵給 ChatGPT 生示意圖</td>
+</tr>
+<tr>
+<td><a href="https://getfloorplan.com/">Getfloorplan</a></td>
+<td>宣稱是——2D／3D／360 導覽</td>
+<td>需確認（原記錄之價格與工期本次無法覆核）</td>
+<td>對照組：外包型服務，與 ChatGPT 無串接</td>
+</tr>
+<tr>
+<td><a href="https://home.by.me/en/floorplan-conversion/upload/floor-plan">HomeByMe</a></td>
+<td>是，但<b>由該平台設計師人工轉製</b>非純自動</td>
+<td>免費帳號 2 個專案、5 張擬真渲染</td>
+<td>對照組：品質較穩但要等人工，急件不適用</td>
+</tr>
+<tr>
+<td><a href="https://floorplanner.com/pricing">Floorplanner</a></td>
+<td>是——線上繪 2D 後可切 3D 檢視</td>
+<td>免費 5 個專案（限 3 層樓／3 設計，SD 輸出帶浮水印）</td>
+<td>對照組：需自己畫，不是上傳即轉</td>
+</tr>
+<tr>
+<td><a href="https://foyr.com/3d-floor-plan-software/">Foyr Neo</a></td>
+<td>是——平面圖轉全套裝修 3D 渲染</td>
+<td>需確認</td>
+<td>對照組：定位是設計師專業工作流，取代而非搭配</td>
+</tr>
+<tr>
+<td><a href="https://magicplan.app/pricing">magicplan</a></td>
+<td>部分——主力是相機掃描出平面圖，3D 多為加購</td>
+<td>需確認</td>
+<td>互補：現場快速量測出圖，再交給 ChatGPT 生示意圖</td>
+</tr>
+<tr>
+<td><a href="https://www.coohom.com/case/ai-floor-planner">Coohom AI Floor Planner</a></td>
+<td><b>否</b>——查證後只出可編輯 2D 平面圖（可移牆／改尺寸／增刪門窗）</td>
+<td>免費方案起，至 US$69 共四級</td>
+<td>前處理：把手繪或拍照的髒平面圖洗成乾淨 2D，再餵 ChatGPT</td>
+</tr>
+<tr>
+<td><a href="https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605">easy-peasy.ai</a></td>
+<td>出的是<b>3D 感圖片</b>（Nano Banana Pro），非模型</td>
+<td>積分制，該範例標示 2 積分</td>
+<td>可略過工具、只抄它的 prompt 貼進 ChatGPT</td>
+</tr>
+<tr>
+<td><a href="https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html">Nano Banana Pro（Google）</a></td>
+<td>出的是<b>3D 感圖片</b>，非模型</td>
+<td>500 free tokens，超出付費</td>
+<td>橫向對照：同一份 prompt 兩邊各跑一次，挑好的用</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- 7 -->
+<h2><span class="sec-no">07</span>實作手冊：平面圖轉 3D 等角圖標準流程</h2>
+<p class="note">以下 7 步為本報告依據上述來源整併的操作流程，建議在 ChatGPT 開一個專案（Project）固定使用，讓格局規則不必每次重講。</p>
+
+<div class="card">
+<h4>第 1 步　準備平面圖</h4>
+<p>用建商電子檔優先；只有紙本就正上方拍攝（斜拍會變梯形，AI 會把梯形當成真的格局）。先把圖上的<b>標註雜訊清掉</b>：尺寸線、圖例、公司浮水印、案名。留下牆線、門洞、窗、房間名稱。</p>
+<p class="warn-txt">上傳前先遮蔽地址、屋主姓名、建案名稱等個資。</p>
+</div>
+
+<div class="card">
+<h4>第 2 步　標比例尺與主要尺寸</h4>
+<p>在圖上或訊息裡補一句實際數據，AI 才不會把 3 坪的浴室畫成飯店規格。</p>
+<p class="kv"><b>在 ChatGPT 這樣說</b>「這是一戶台灣公寓，室內約 28 坪（92 平方公尺），天花板高 2.8 公尺。主臥約 4.2 × 3.3 公尺。」</p>
+</div>
+
+<div class="card">
+<h4>第 3 步　先分析、不生圖</h4>
+<p>上傳圖後，第一則訊息不要叫它畫圖，先叫它<b>用文字複述格局</b>。這是全套資料中唯一有實測失敗紀錄背書的關卡。</p>
+<p class="kv"><b>在 ChatGPT 這樣說</b>照抄第 3 節第 2 條的第一段中文 prompt（請先分析這張平面圖，不要生成圖片…）。</p>
+</div>
+
+<div class="card">
+<h4>第 4 步　核對它的複述，錯了就當場糾正</h4>
+<p>逐條看它列的房間數、相對位置、門窗位置。有錯就直接回：「錯了，餐廳在客廳<b>右側</b>不是左側；北面那道牆<b>沒有窗</b>。請重新列一次。」複述正確之前，不要讓它畫圖。</p>
+</div>
+
+<div class="card">
+<h4>第 5 步　生圖</h4>
+<p>貼第 3 節第 2 條的第二段英文 prompt（或第 4 條的填空模板，看用途）。工程溝通用「無家具、標牆高」那版；客戶提案用「有家具、暖材質」那版。</p>
+<p class="kv"><b>在 ChatGPT 這樣說</b>「依照剛才你確認的格局生成。」＋貼上英文 prompt。</p>
+</div>
+
+<div class="card">
+<h4>第 6 步　檢查牆、門、窗位置（人眼把關）</h4>
+<p>把生成圖與原平面圖並排，照本節末的驗收 5 問逐項比。發現錯誤要<b>指名修</b>，不要籠統說「格局不對」。</p>
+<p class="kv"><b>在 ChatGPT 這樣說</b>「主臥和次臥之間的隔間牆不見了，請補回；南面陽台你多畫了一扇窗，原圖沒有，請移除。其他不要動。」</p>
+</div>
+
+<div class="card">
+<h4>第 7 步　補材質、出多視角、定稿</h4>
+<p>格局確認後才調材質與光線（順序反了會連格局一起重擲）。要多視角就沿用同一句話換方位：<code>View from the front-right corner at 45 degrees.</code>／<code>rear</code>／<code>front-left</code>。定稿前再跑一次驗收 5 問。</p>
+<p class="kv"><b>在 ChatGPT 這樣說</b>「格局維持不變，只把地板換成淺橡木、牆面換成米白，其餘完全不動。」</p>
+</div>
+
+<h3>驗收 5 問（每張圖交出去前都問一次）</h3>
+<div class="soft">
+<ol>
+<li><b>房間數對嗎？</b>原圖幾間房、幾套衛浴，圖上就要是幾間，沒有被併也沒有被多切。</li>
+<li><b>隔間牆位置與相對比例對嗎？</b>客廳與餐廳誰大誰小、主臥在哪一側，與原圖一致。</li>
+<li><b>門洞與開啟方向對嗎？</b>有沒有憑空多一道門，或把門開在承重牆上。</li>
+<li><b>窗戶只出現在原圖有窗的位置嗎？</b>這是最常見的錯誤，AI 很愛替暗房加窗。</li>
+<li><b>有沒有台灣住宅不會有的東西？</b>壁爐、天窗、閣樓、室內樓梯——有就是 AI 自己加的，必須移除。</li>
+</ol>
+<p class="note">五問全過才算完成。任一不過，回到第 6 步指名修，不要整張重生。</p>
+</div>
+
+<!-- 8 -->
+<h2><span class="sec-no">08</span>可行性評估與建議</h2>
+<p class="note">本節把前七節的事實整併成 10 項可執行建議，逐項評估技術可行性、成本、效益、風險與優先序。成本欄凡本報告無來源支撐者一律標「需確認」並附估算依據；時間欄的分鐘／小時為依既有流程步數推估的<b>預估值，非實測</b>。標「未能覆核」的價格與工期（如 Getfloorplan）不列為已知數。</p>
+
+<div class="tbl">
+<table style="min-width:1360px;">
+<thead>
+<tr><th>建議項</th><th>對應資源</th><th>技術可行性</th><th>成本（費用／時間／人力）</th><th>預期效益</th><th>主要風險</th><th>優先序</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>① 路線 A：ChatGPT 直出等角 3D</b><br><span class="note">一句話 prompt 試水溫＋兩段式（先分析、確認後才生圖）</span></td>
+<td><a href="https://github.com/jamez-bondos/awesome-gpt4o-images/blob/main/gpt-image-1/gpt-image-1-en.md">jamez-bondos Example 20</a>；<a href="https://www.aiposthub.com/chatgpt-2d-floor-plan-to-3d-interior-render/">aiposthub 兩段式教學</a>（本報告第 03 節第 1、2 條）</td>
+<td><b>高</b>——全套資料裡唯一「prompt 逐字原文＋模型參數＋輸入輸出對照圖」三證齊全的做法，另一筆有作者實測紀錄背書。</td>
+<td>費用：網頁版上傳生圖在現有 ChatGPT 訂閱額度內；來源標示的 gpt-image-1／quality=high／1536x1024 走 API 才需額度，費率<b>需確認</b>（依 OpenAI 當期公告）。<br>時間：單張含核對與修改約 10–20 分鐘（估算依據：兩段式多一輪文字複述＋人眼比對）。<br>人力：老闆自己，不需工程協助。</td>
+<td>客戶溝通：一張看得懂的等角剖視圖。提案速度：數十秒出圖，不必等建模。格局保真：靠兩段式與人眼把關撐住。</td>
+<td>AI 自行加窗、誤讀廚房線條（來源作者實測即發生）；產出是圖片非模型，不得作施工或估價依據。</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td><b>② 如菓版 prompt 進專案知識檔</b><br><span class="note">第 03 節 5 條改寫＋專案指令</span></td>
+<td>本報告第 03 節 5 條「如菓版改寫」；骨幹句出自 <a href="https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image-gen-models-prompting-guide.ipynb">OpenAI Cookbook 提示詞指南</a></td>
+<td><b>高</b>——純文字資產，貼進 ChatGPT 專案即生效，無技術門檻。</td>
+<td>費用：0（訂閱額度內）。<br>時間：整理成檔約 1–2 小時，之後每案 ≤ 2 分鐘。<br>人力：老闆自己。</td>
+<td>格局規則不必每次重講，多案出圖一致；模板可交接，不綁個人。</td>
+<td>5 條如菓版皆為<b>自製草稿、未實測</b>；未跑過真實案場就當定稿，等於把未驗證措辭固定下來。</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td><b>③ 路線 A 進階：多視角一致與局部 edit</b><br><span class="note">等角→透視→單房特寫</span></td>
+<td><a href="https://boardspace.ai/gpt-image-prompt-guide/">boardspace 三組視角片段</a>；<a href="https://www.threads.com/@reroomai/post/DXtdASwk_ko/">ReRoom 三段式</a>；本報告第 07 節第 6、7 步</td>
+<td><b>中</b>——換方位句式（front-left／front-right／rear at 45 degrees）有來源可抄；但 ReRoom 未附 prompt 原文、boardspace 未附成果圖，同一戶多視角的一致性無來源驗證。</td>
+<td>費用：訂閱額度內，多張生圖吃額度，方案上限<b>需確認</b>。<br>時間：單案 4 張約 30–60 分鐘（估算：每張都要重跑驗收）。<br>人力：老闆自己。</td>
+<td>一套圖走完提案（全戶等角＋主空間透視＋特寫），客戶決策更快。</td>
+<td>每換一次視角 AI 可能重擲格局；多張之間家具材質不一致反而露餡。</td>
+<td><span class="pill clay">短期試辦（1–2 週）</span></td>
+</tr>
+<tr>
+<td><b>④ 路線 B：低價工具建 3D 白模→ChatGPT 上材質</b></td>
+<td><a href="https://planner5d.com/ai/floor-plan-to-3d-model">Planner 5D</a>（吃 DWG／DXF）；<a href="https://floorplanner.com/pricing">Floorplanner</a>；<a href="https://home.by.me/en/floorplan-conversion/upload/floor-plan">HomeByMe</a>；<a href="https://www.coohom.com/case/ai-floor-planner">Coohom</a>（查證後只出 2D，不列入本項）</td>
+<td><b>中</b>——工具端「出真 3D」有官網明示（Planner 5D 出可編輯互動 3D、Floorplanner 可切 3D 檢視）；但「白模截圖再交 ChatGPT 上材質」這條串接，本批<b>無任何來源實測</b>。</td>
+<td>費用：Planner 5D 每人一次免費試用（官網標訂閱首年 5 折）、Floorplanner 免費 5 專案（限 3 層樓／3 設計、SD 輸出帶浮水印）、HomeByMe 免費 2 專案 5 張渲染；長期訂閱價<b>需確認</b>。<br>時間：首次上手 2–4 小時，之後每案 1–2 小時（估算：需自行繪製或匯入 CAD）。<br>人力：老闆自己；要常態化需一位助理熟練建模。</td>
+<td>格局保真最高——幾何由自己建，AI 只負責材質光影，不再亂加門窗。</td>
+<td>免費額度限制（專案數、浮水印）；工時遠高於路線 A，急件不適用；HomeByMe 為平台設計師人工轉製，要等。</td>
+<td><span class="pill clay">短期試辦（1–2 週）</span></td>
+</tr>
+<tr>
+<td><b>⑤ 平面圖前處理：去標註、標比例尺、洗乾淨</b></td>
+<td>本報告第 07 節第 1、2 步；<a href="https://www.coohom.com/case/ai-floor-planner">Coohom</a>（髒圖洗成乾淨可編輯 2D）；<a href="https://www.cubi.casa/3d-floor-plans/">CubiCasa</a>（現場沒圖時掃描出圖，輸出 DWG／DAE／FBX／OBJ）</td>
+<td><b>高</b>——去標註與補比例尺是既有流程內的步驟，零技術門檻；洗髒圖與現場掃描才需外部工具。</td>
+<td>費用：去標註 0（現有繪圖軟體）；Coohom 免費方案起、四級至 US$69；CubiCasa 免費額度<b>需確認</b>。<br>時間：每案 15–30 分鐘。<br>人力：老闆自己。</td>
+<td>直接提高格局保真——本報告把「原圖線條乾淨」列為保真三要件之一；同時解掉平面圖上中文字被畫進圖裡。</td>
+<td>清圖清過頭把門洞或窗一併清掉；上傳前個資（地址、屋主姓名、建案名）未遮蔽。</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td><b>⑥ 路線 C：純外部自建程式／自建管線</b></td>
+<td>第 09 節未深讀清單的開源專案（<a href="https://github.com/AryanMore/Floor_Plan_To_3D">Floor_Plan_To_3D</a>、<a href="https://github.com/zhao0524/AURA">AURA</a>、<a href="https://github.com/Wahaj-golang/image2mesh">image2mesh</a> 等）；概念層 <a href="https://github.com/CubiCasa/CubiCasa5k">CubiCasa5k</a>、<a href="https://github.com/ywyue/RoomFormer">RoomFormer</a></td>
+<td><b>低</b>——全部未深讀、無一筆附實測成果或精度數據；多為個人專案，維護與正確性未知。</td>
+<td>費用：<b>需確認</b>（自建需開發工時與運算資源）。<br>時間：以週計。<br>人力：<b>需工程協助</b>，如菓現無此人力。</td>
+<td>理論上可產可編輯 3D，但對「客戶當場看懂」這件事的增量小於路線 A。</td>
+<td>投入不可回收；產出精度無保證，仍不能當施工依據。</td>
+<td><span class="pill warn">暫不建議</span><br><span class="note">只看概念：CubiCasa5k 的門窗牆標註結構、RoomFormer 的房間多邊形化，可當日後判斷工具好壞的底子。</span></td>
+</tr>
+<tr>
+<td><b>⑦ Nano Banana Pro（Google）同 prompt 並排比較</b></td>
+<td><a href="https://edrawmax.wondershare.com/ai-tips/2d-floor-plan-to-3d-nano.html">edrawmax 四版填空模板</a>（2026-05-26）；<a href="https://easy-peasy.ai/ai-image-generator/images/top-down-fully-3d-isometric-bbf412de-ba3c-45ef-827d-f5a01c741605">easy-peasy.ai 等角範例</a>；<a href="https://blog.google/innovation-and-ai/products/nano-banana-pro/">Google 官方發佈稿</a></td>
+<td><b>中</b>——prompt 是純文字約束、無模型相依，兩邊各跑一次即可比；但兩來源皆無成果圖佐證，且 edrawmax 作者自承常見版面混亂、天花板比例錯誤、窗戶方向錯置。</td>
+<td>費用：500 free tokens 免費額度內可試，超出付費（費率<b>需確認</b>）；easy-peasy.ai 該範例標示單張 2 積分。<br>時間：半天（同一份 prompt 兩邊各 3 張）。<br>人力：老闆自己。</td>
+<td>回答「ChatGPT 是不是最好選擇」——本報告第 10 節把「零 Gemini 對照」列為缺口二。</td>
+<td>多養一條工具線的學習與訂閱成本；免費 token 用完即停。</td>
+<td><span class="pill clay">短期試辦（1–2 週）</span></td>
+</tr>
+<tr>
+<td><b>⑧ primax-validator 類驗證器是否值得接</b></td>
+<td><a href="https://github.com/ChaiAbs/primax-validator">primax-validator (PRiMAX)</a></td>
+<td><b>低</b>（接系統）／<b>高</b>（借思路）——該專案全程沒用 ChatGPT、需備齊多組付費金鑰；但「先產多版、再自動選最佳」的把關思路可直接手動照做。</td>
+<td>費用：<b>需確認</b>（多組 API 金鑰）。<br>時間：導入以週計。<br>人力：<b>需工程協助</b>。<br>（手動版：費用 0、時間每案多 5 分鐘。）</td>
+<td>把關自動化；但第 07 節驗收 5 問的人工把關已可覆蓋同一件事。</td>
+<td>該專案 README 未量化比例與格局保真度，等於「看起來完整但無保真數據」；接了仍要人眼複核。</td>
+<td><span class="pill warn">暫不建議</span><br><span class="note">改採零成本手動版：一次生 3 張、人眼挑一張，納入第 07 節流程。</span></td>
+</tr>
+<tr>
+<td><b>⑨ 商用付費服務外包 3D 平面圖</b></td>
+<td><a href="https://getfloorplan.com/">Getfloorplan</a>（宣稱 2D／3D／360 導覽）；<a href="https://home.by.me/en/floorplan-conversion/upload/floor-plan">HomeByMe</a>（人工轉製）；<a href="https://foyr.com/3d-floor-plan-software/">Foyr Neo</a></td>
+<td><b>中</b>——服務存在且官網宣稱可交付，但如菓端未實測、品質未知。</td>
+<td>費用：<b>需確認</b>——Getfloorplan 的價格與工期本報告<b>未能覆核，不得當已知數</b>，須自行詢價；HomeByMe 免費額度用完後訂閱價需確認；Foyr Neo 需確認。<br>時間：外包等待（HomeByMe 為人工轉製，急件不適用）。<br>人力：老闆自己下單即可。</td>
+<td>適用「大坪數／樣品屋級提案」需要 360 導覽這類路線 A 做不到的交付形式。</td>
+<td>客戶平面圖送第三方平台的個資與圖說外流風險；成本隨案累加，能力無法內化。</td>
+<td><span class="pill warn">暫不建議</span><br><span class="note">列為備援：路線 A、B 都不過且客戶願付費時再詢價。</span></td>
+</tr>
+<tr>
+<td><b>⑩「平面圖→3D」標準交付流程進如菓 SOP</b><br><span class="note">含驗收 5 問檢核表</span></td>
+<td>本報告第 07 節 7 步流程與驗收 5 問</td>
+<td><b>高</b>——流程已成文，只差落成一頁檢核表與交付規格。</td>
+<td>費用：0。<br>時間：半天寫成檢核表。<br>人力：老闆自己。</td>
+<td>三項全中：客戶溝通（每張圖交出去前都過 5 問）、提案速度（不必每次重想）、格局保真（把關點固定不漏）。</td>
+<td>SOP 寫死後，模型改版可能讓既有措辭失效，需定期回頭校準。</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>逐項展開：現在就做（4 項）</h3>
+
+<div class="card">
+<h4>① 路線 A：ChatGPT 直出等角 3D</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>挑 2 張已完工案場平面圖，一張簡單兩房、一張複雜三房以上；去掉標註與個資後存成清晰圖檔。</li>
+<li>在 ChatGPT 開一個專案（名稱如「平面圖轉 3D」），把第 03 節第 2 條的兩段式 prompt 貼進專案指令。</li>
+<li>上傳第一張圖，第一則訊息只貼中文第一段（請先分析這張平面圖，不要生成圖片…），核對房間數與門窗位置，錯的當場糾正到全對為止。</li>
+<li>貼第二段英文 prompt 生圖；沒過就用第 07 節第 6 步的「指名修」句型修，最多 2 輪。</li>
+<li>兩張都跑完，記錄每張的耗時、修改輪數、驗收 5 問通過數。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>驗收 5 問通過 <b>5/5</b>（簡單戶型必須達成；複雜戶型至少 4/5，且缺的那項能在 2 輪指名修內補上）。</li>
+<li>牆／門／窗位置與原圖<b>一致率 ≥ 90%</b>（以原圖門窗與隔間牆總數為分母，逐個點名數）。</li>
+<li>單張耗時（含核對與修改）<b>≤ 20 分鐘</b>。</li>
+<li>拿給 3 位非設計背景的人看，不用解說就能講出房間數與客廳位置者 <b>≥ 2 人</b>。</li>
+</ul>
+<p class="kv"><b>停損條件</b>同一張圖修 2 輪仍未通過 5 問，或簡單戶型兩張都達不到 90% 一致率 → 停手，改走建議④（先建白模再上材質）。</p>
+</div>
+
+<div class="card">
+<h4>② 如菓版 prompt 進 ChatGPT 專案知識檔</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>把第 03 節 5 條的「如菓版改寫」整理成一份 prompt 模板檔（如菓 ChatGPT 專案知識檔 05_prompt 模板），每條標明用途：試水溫／客戶提案／社群圖卡／工程溝通／自製骨幹。</li>
+<li>每條下方標「來源出處」與「自製草稿、未實測」；實測通過後才把後者改成「已實測（日期）」。</li>
+<li>專案指令寫死三條硬規則：不得新增原圖沒有的門窗、天花板高 2.8 公尺、生圖前先用文字複述格局。</li>
+<li>之後每案只需上傳平面圖並說「用客戶提案版」。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>同一張平面圖、同一句指令，連續 3 次出圖的房間數與隔間位置<b>一致 3/3</b>（才算專案指令真的生效）。</li>
+<li>每案 prompt 準備時間由「重寫一次」降到 <b>≤ 2 分鐘</b>。</li>
+<li>5 條模板<b>全數</b>標註來源與實測狀態，無一條裸奔。</li>
+</ul>
+<p class="kv"><b>停損條件</b>專案指令設好後仍連續 2 次出現「AI 自行加窗」→ 判定指令沒被吃到，改成每則訊息開頭重述硬規則，不再依賴專案指令。</p>
+</div>
+
+<div class="card">
+<h4>⑤ 平面圖前處理</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>建一份「上傳前清單」：遮個資（地址／屋主姓名／建案名）、刪尺寸線與圖例、刪浮水印，保留牆線、門洞、窗與房間名稱。</li>
+<li>紙本一律正上方拍攝、四角入鏡不歪斜；歪了就重拍，不要用軟體硬拉（拉過的梯形 AI 會當成真格局）。</li>
+<li>訊息裡固定補一句實際尺度：「室內約 XX 坪（XX 平方公尺），天花板高 2.8 公尺，主臥約 X.X × X.X 公尺。」</li>
+<li>手繪或翻拍的髒圖，先用 Coohom 免費方案洗成乾淨可編輯 2D，再進 ChatGPT。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>清圖後，AI 在文字複述階段<b>一次就把房間數講對</b>的比例 <b>≥ 80%</b>（以 5 張為樣本）。</li>
+<li>生成圖中出現原圖中文字的張數 <b>= 0</b>。</li>
+<li>每張清圖耗時 <b>≤ 30 分鐘</b>。</li>
+</ul>
+<p class="kv"><b>停損條件</b>清圖後複述仍常錯（5 張中 ≥ 3 張錯）→ 判定問題不在圖而在 prompt，回頭調②的專案指令，不再加碼清圖工時。</p>
+</div>
+
+<div class="card">
+<h4>⑩「平面圖→3D」標準交付流程進 SOP</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>把第 07 節 7 步流程與驗收 5 問做成一頁檢核表，欄位：案場名、圖檔來源、清圖完成、複述通過、生圖輪數、5 問逐項打勾、交付形式。</li>
+<li>定義三種交付規格：客戶提案用「有家具、暖材質」版，工程溝通用「無家具、標牆高」版，社群圖卡用「等角迷你模型」版。</li>
+<li>每張對外圖固定加註「AI 生成示意圖，不具工程精度，不得作為施工、估價或報建依據」。</li>
+<li>前 5 案填完檢核表後回頭校準門檻值（一致率、耗時）。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>前 5 案<b>100%</b> 有填檢核表（沒填不准交付）。</li>
+<li>對外圖<b>100%</b> 帶免責註記。</li>
+<li>「5 問全過才交付」達成率 <b>100%</b>。</li>
+</ul>
+<p class="kv"><b>停損條件</b>檢核表讓單案多花 &gt; 15 分鐘 → 精簡成「5 問打勾一列」，其餘欄位取消。</p>
+</div>
+
+<h3>逐項展開：短期試辦 1–2 週（3 項）</h3>
+
+<div class="card">
+<h4>③ 多視角一致與局部 edit</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>在①已通過驗收的那張等角圖的同一段對話裡，接著要求同一戶的客廳單點透視（沿用 boardspace 的 35mm、暖午光措辭）。</li>
+<li>換方位各出一張：<code>View from the front-right corner at 45 degrees.</code>／<code>rear</code>／<code>front-left</code>。</li>
+<li>單房特寫走局部修改，一次只改一項：「格局維持不變，只把地板換成淺橡木，其餘完全不動。」</li>
+<li>4 張並排，檢查家具配置、地板材質、牆色是否認得出是同一戶。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>4 張中可辨識為同一戶（家具與材質一致）者 <b>≥ 3 張</b>。</li>
+<li>每換一次視角，驗收 5 問<b>仍全過</b>（每張都要重跑，不得只驗第一張）。</li>
+<li>單案 4 張總耗時 <b>≤ 60 分鐘</b>。</li>
+</ul>
+<p class="kv"><b>停損條件</b>換視角後格局跑掉、指名修 2 輪救不回 → 多視角收斂成「等角＋一張主空間透視」兩張，不再擴充。</p>
+</div>
+
+<div class="card">
+<h4>④ 低價工具建 3D 白模 → ChatGPT 上材質</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>取一張已知格局的平面圖，用 Planner 5D 的一次性免費試用建成 3D；手上有 CAD 圖就走它的 DWG／DXF 匯入（沒有 CAD 圖則用 Floorplanner 免費 5 專案自己畫）。</li>
+<li>出一張無材質白模的 45 度等角截圖。</li>
+<li>把白模截圖丟 ChatGPT，用第 03 節第 5 條骨幹句（Preserve the exact layout… Do not add new elements or text）<b>只要求上材質與打光</b>，不准動幾何。</li>
+<li>與同一戶的路線 A 直出圖並排，比保真度與總耗時。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>牆／門／窗一致率 <b>100%</b>（幾何是自己建的，低於 100% 就代表 AI 在改）。</li>
+<li>全流程單案耗時 <b>≤ 2 小時</b>（超過就失去對客戶的速度優勢）。</li>
+<li>並排比較時，格局錯誤數<b>少於</b>路線 A 才算這條路贏。</li>
+</ul>
+<p class="kv"><b>停損條件</b>免費額度用完前未完成一次完整比較，或單案耗時 &gt; 3 小時 → 收回常態使用，只在「路線 A 連兩次不過的複雜戶型」啟用。</p>
+</div>
+
+<div class="card">
+<h4>⑦ Nano Banana Pro 同 prompt 並排比較</h4>
+<p class="kv"><b>試辦步驟</b></p>
+<ol>
+<li>取一張已在 ChatGPT 跑過的平面圖，用<b>同一份</b>如菓版 prompt 在 Nano Banana Pro 跑 3 張。</li>
+<li>另跑 edrawmax 的工程溝通版填空模板（無家具、標牆高）各 1 張，兩邊條件對齊。</li>
+<li>兩邊各挑最佳一張並排，用驗收 5 問逐項打分。</li>
+<li>記錄免費 token 消耗，換算「一戶大約要花多少」。</li>
+</ol>
+<p class="kv"><b>驗收指標</b></p>
+<ul>
+<li>兩邊各 3 張中，驗收 5 問<b>全過的張數</b>——哪邊多哪邊贏。</li>
+<li>中文字被畫進圖裡的張數（目標 <b>0</b>）。</li>
+<li>500 free tokens 內跑得完幾張，作為要不要續用的依據。</li>
+</ul>
+<p class="kv"><b>停損條件</b>免費 token 用完仍沒有一張優於 ChatGPT → 結論記為「ChatGPT 為主線」，不再投入，第 10 節缺口二視同已答。</p>
+</div>
+
+<h3>對如菓的適用場景</h3>
+<div class="soft">
+<p><b>預售屋客變</b>是最直接的戰場：客戶盯著建商標準平面圖看不懂「這道牆拆掉會變怎樣」，等角剖視圖可以在同一次會議裡出「原案 vs 客變後」兩張並排，當場定案，省掉來回一週的想像落差。<b>新成屋交屋提案</b>次之：交屋時屋主看的是空屋，一張含家具、依實際坪數配置的等角圖，能讓他直接判斷沙發擺不擺得下、動線順不順，比純平面圖有效得多。<b>中古屋翻新前後對照</b>是簽約前最有說服力的素材——現況平面圖出一張、拆改後平面圖出一張，同一視角、同一材質語彙並排；前提是兩張都得過驗收 5 問，否則對照本身就失真，反而傷信任。<b>社群圖卡</b>則適合用第 03 節第 3 條的等角迷你模型風格：畫面乾淨、無中文字、模型感強，當貼文主圖或提案封面都夠看。不論哪一種，對外圖一律加註「AI 生成示意圖，不具工程精度」，避免客戶誤把示意當施工圖。</p>
+</div>
+
+<!-- 9 -->
+<h2><span class="sec-no">09</span>未深讀清單（46 筆）</h2>
+<p class="note">已建檔但本次未逐頁深讀，留待需要時再開。</p>
+<ul class="list-lite">
+<li><a href="https://edrawmax.wondershare.com/ai-tips/2d-to-3d-floor-plan-converter.html">A Guide To Convert 2D Floor Plans to 3D With ChatGPT 4o</a>｜部落格｜整理數個 ChatGPT-4o 常用 prompt，建議分區塊渲染以求準確。</li>
+<li><a href="https://www.hanyuai.com/zh/ai-tutorial/ai-floorplan-to-render-tutorial">房屋平面圖轉裝修效果圖 AI 教程</a>｜部落格｜簡中站 4 個單房間案例（客廳／臥室／餐廳／衛浴）附中文風格關鍵詞。</li>
+<li><a href="https://docsbot.ai/prompts/technical/exploded-axonometric-drawing">Exploded Axonometric Drawing — AI Prompt</a>｜部落格｜兩張平面圖＋兩張剖面圖組合成分解軸測圖的完整指令。</li>
+<li><a href="https://aiistudio.com/prompt/2008559432016286198/architectural-survey-board">Architectural survey board — GPT Image 2 prompt</a>｜產品頁｜三分割建築測繪板，中段用剖切軸測揭露結構層與隱藏設施。</li>
+<li><a href="https://promptbase.com/prompt/3d-floor-plans-2">3D Floor Plans ChatGPT Image Prompt</a>｜產品頁｜付費 4.99 美元的 63 字模板，可調房數／風格／材質，含 9 個展示範例。</li>
+<li><a href="https://www.threads.com/@ai_architecture_landspace/post/DXfTEGBgLRU/test-out-chat-gpt-images-prompt-create-an-exploded-axonometric-urban-design">Test out ChatGPT Images 2.0 — exploded axonometric urban design</a>｜Threads｜實測生成城市尺度分解軸測分析圖。</li>
+<li><a href="https://github.com/AryanMore/Floor_Plan_To_3D">Floor_Plan_To_3D</a>｜GitHub｜2D 藍圖轉 3D。</li>
+<li><a href="https://github.com/zhao0524/AURA">AURA</a>｜GitHub｜2D 平面圖轉 3D 模型。</li>
+<li><a href="https://github.com/montumynestme-ship-it/2d_floor_plan_to_3d_image_generator">2d_floor_plan_to_3d_image_generator</a>｜GitHub｜2D 平面圖轉 3D 圖像生成器。</li>
+<li><a href="https://github.com/Tanishqueue/floor2model">floor2model</a>｜GitHub｜用電腦視覺做平面圖轉 3D 模型轉換。</li>
+<li><a href="https://github.com/jawadjutt6/floorplan3d">floorplan3d</a>｜GitHub｜AI 驅動的 2D 平面圖轉 3D CAD 模型轉換器。</li>
+<li><a href="https://github.com/jgalt0311/floor-plan-3d-converter">floor-plan-3d-converter</a>｜GitHub｜把 2D 平面圖轉 3D 模型的網頁應用。</li>
+<li><a href="https://github.com/Wahaj-golang/image2mesh">image2mesh</a>｜GitHub｜2D 平面圖轉 3D 模型。</li>
+<li><a href="https://github.com/sooryagowri/Plan2Nav">Plan2Nav</a>｜GitHub｜平面圖轉 3D 模型並以 GeoJSON 顯示在地圖上。</li>
+<li><a href="https://github.com/kishore110804/YourSpace-in-3D">YourSpace-in-3D</a>｜GitHub｜2D 平面圖轉第一人稱走查的重建部分。</li>
+<li><a href="https://github.com/CubiCasa/CubiCasa5k">CubiCasa5k</a>｜GitHub｜平面圖資料集＋論文，含門／窗／牆結構化標註，是平面圖辨識最常被引用的資源。</li>
+<li><a href="https://github.com/3dlg-hcvc/r2v-to-plan2scene">r2v-to-plan2scene</a>｜GitHub｜把平面圖向量化結果轉成 3D 場景生成模型的輸入格式。</li>
+<li><a href="https://github.com/jawnjminer/floorplan-3d-mvp">floorplan-3d-mvp</a>｜GitHub｜平面圖轉第一人稱可導航 3D 網頁視圖，支援樓層切換。</li>
+<li><a href="https://github.com/jackie-csu/accurate-floorplan-3d-skill">accurate-floorplan-3d-skill</a>｜GitHub｜面積校準的 2D／可旋轉 3D 平面圖重建技能包。</li>
+<li><a href="https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide">GPT Image Generation Models Prompting Guide</a>｜官方｜gpt-image 系列的 prompt 結構、明確約束與小步迭代修改法。</li>
+<li><a href="https://blog.google/innovation-and-ai/products/nano-banana-pro/">Nano Banana Pro: Gemini 3 Pro Image model</a>｜官方｜Google 官方發佈新聞稿。</li>
+<li><a href="https://github.com/aminshabani/house_diffusion">HouseDiffusion</a>｜GitHub｜用擴散模型對房間／門角點座標去噪，直接生成向量平面圖。</li>
+<li><a href="https://arxiv.org/abs/2211.13287">HouseDiffusion (arXiv 2211.13287)</a>｜論文｜前述方法的論文原文。</li>
+<li><a href="https://github.com/ywyue/RoomFormer">RoomFormer (CVPR 2023)</a>｜GitHub｜Transformer 單階段結構化預測，並行生成多房間多邊形。</li>
+<li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0926580522003430">FloorplanGAN</a>｜論文｜GAN 架構直接生成向量格式平面圖，含房間關係建模。</li>
+<li><a href="https://www.cubi.casa/3d-floor-plans/">CubiCasa 3D Floor Plans</a>｜官網｜手機掃描 5-10 分鐘上傳，6-24 小時回傳 3D 建模，輸出 DWG／FBX／OBJ 等。</li>
+<li><a href="https://home.by.me/en/floorplan-conversion/upload/floor-plan">HomeByMe 平面圖轉製</a>｜官網｜上傳 2D 圖後由平台設計師人工轉 3D；免費帳號 2 專案、5 張渲染。</li>
+<li><a href="https://floorplanner.com/pricing">Floorplanner 價格頁</a>｜官網｜免費 5 專案（限 3 層樓／3 設計、SD 帶浮水印），26 萬件以上家具建材庫。</li>
+<li><a href="https://foyr.com/3d-floor-plan-software/">Foyr Neo</a>｜官網｜雲端渲染引擎，平面圖轉全套裝修 3D 渲染。</li>
+<li><a href="https://magicplan.app/pricing">magicplan 價格頁</a>｜官網｜相機掃描自動生成平面圖，定位偏估價／保險／房仲。</li>
+<li><a href="https://architizer.com/blog/practice/tools/tech-for-architects-how-to-create-a-stunning-rendering-from-a-simple-floorplan-using-ai/">Tech for Architects: Stunning Rendering from a Simple Floorplan</a>｜部落格｜指出常見錯誤：家具方向錯、缺馬桶、牆體變形。</li>
+<li><a href="https://theresanaiforthat.com/gpt/gpt-floorplan-builder/">GPT FloorPlan Builder</a>｜產品頁｜第三方開發、架在 ChatGPT 商店的自訂 GPT，宣稱手繪草圖轉 3D 模型。</li>
+<li><a href="https://www.roomsketcher.com/blog/can-chatgpt-make-floor-plans/">Can ChatGPT Make Floor Plans? We Put It to the Test</a>｜部落格｜第三方軟體商實測 ChatGPT 產平面圖與 3D 的準確度，附截圖比較。</li>
+<li><a href="https://visionaryshub.blogspot.com/2026/06/ai3dai.html">AI 室內設計教學到底怎麼學？</a>｜部落格｜繁中總覽學習路徑，含平面圖轉 3D 章節。</li>
+<li><a href="https://www.feeldesign.ai/zh/post/ai-2d-to-3d-transformations">5 分鐘學會 AI 2D 轉 3D</a>｜部落格｜繁中教學，平面圖到立體模型的方法概覽。</li>
+<li><a href="https://chisun-design.com/a-complete-guide-to-ai-generated-3d-renderings/">3D 圖 AI 完整攻略</a>｜部落格｜設計事務所整理的 AI＋Blender 完整工作流。</li>
+<li><a href="https://www.meltflexai.com/blog/2d-floor-plan-to-3d-model-ai">9 Best Free AI Floor Plan to 3D Tools, Tested (2026)</a>｜部落格｜橫向實測多款免費工具的效果與限制。</li>
+<li><a href="https://promptbase.com/prompt/3d-isometric-rooms">3D Isometric Rooms — Midjourney Prompt</a>｜產品頁｜等角房間 prompt 商品（皮克斯風格），非 gpt-image 但常被引用比較。</li>
+<li><a href="https://github.com/zengpengyu-student/Residential_Floorplan_Diffusion">Residential_Floorplan_Diffusion</a>｜GitHub｜用擴散模型生成住宅平面圖。</li>
+<li><a href="https://github.com/nickiliak/Floorplan-Diffusion-Models">Floorplan-Diffusion-Models</a>｜GitHub｜在 ResPlan 資料集上微調 HouseDiffusion，含門節點標註。</li>
+<li><a href="https://github.com/jonlil/floorplan-3d-mesh">floorplan-3d-mesh</a>｜GitHub｜從 JSON 標註的平面圖生成 3D 網格物件。</li>
+<li><a href="https://chatgpt.com/g/g-oNFJULbLo-gpt-floorplan-builder">ChatGPT - GPT FloorPlan Builder</a>｜官方｜前述自訂 GPT 的官方入口。</li>
+<li><a href="https://github.com/art-programmer/FloorNet">FloorNet</a>｜GitHub｜手機掃描點雲＋RGB 影像，三分支神經網路重建平面圖。</li>
+<li><a href="https://github.com/gaofeng0828/awesome-gpt-image-prompts">awesome-gpt-image-prompts</a>｜GitHub｜GPT-Image-2 提示詞收集站專案，需進站找平面圖分類。</li>
+<li><a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete">ChatGPT Image 2.0 指令大全！40 組提示詞一次整理</a>｜部落格｜數位時代整理的 40 組指令範例集合。</li>
+<li><a href="https://www.remodelai.io/blog/best-free-ai-3d-floor-plan-apps">Best free AI 3D floor plan apps in 2026</a>｜部落格｜第三方評測免費 AI 3D 平面圖 App，聲稱實測 3D 走查。</li>
+</ul>
+
+<!-- 10 -->
+<h2><span class="sec-no">10</span>缺口與下一步</h2>
+<p>本批 61 筆來源有三個明顯漏掉的方向，各附建議補搜關鍵字：</p>
+
+<div class="card">
+<h4>缺口一：繁體中文、直接對應 GPT Image 2 的現成 prompt 頁，完全沒收到</h4>
+<p>本批繁中來源只有概覽型教學，沒有一頁是「直接給 GPT Image 2 用的平面圖轉 3D prompt」。</p>
+<p class="kv"><b>補搜關鍵字</b><code>YouMind 2D Floor Plan to 3D Real Estate Render GPT Image 2 prompt</code></p>
+</div>
+
+<div class="card">
+<h4>缺口二：零 Gemini 對照，缺少免費替代路線與橫向比較基準</h4>
+<p>40 張卡裡沒有任何 Gemini 版教學。aiposthub 同一作者另有 Gemini 版，既是免費替代路線，也是判斷「ChatGPT 是不是最好選擇」的比較基準。</p>
+<p class="kv"><b>補搜關鍵字</b><code>Gemini 3.0 Pro 平面圖轉 3D 免費</code></p>
+</div>
+
+<div class="card">
+<h4>缺口三：線稿／CAD 風格等角圖方向缺席</h4>
+<p>本批全是寫實渲染路線，沒有收到「等角線框圖／CAD 線條風格」的做法——那才是工程圖說溝通最直接的表現方式。</p>
+<p class="kv"><b>補搜關鍵字</b><code>isometric wireframe floorplan prompt CAD line drawing</code>（可從 StratoBuilds、Home Assistant 社群等已知線索追）</p>
+</div>
+
+<div class="soft">
+<p><b>下一步建議順序：</b>先做第 1 節的三件事（試水溫、定兩段式流程、存自用模板），跑過一輪真實案場圖之後再補上述三個缺口的搜尋——先有實測基準，補搜才知道要看什麼。</p>
+</div>
+
+<!-- 11 -->
+<footer>
+<p><b>資料截止</b>　2026-08-19。本報告所有來源皆為公開網頁，掃描 86 筆、深讀建卡 15 筆、抽驗覆核 19 項、未深讀 46 筆。</p>
+<p><b>來源類型</b>　官方文件與公告、社群精選 prompt 集、教學部落格（中英）、社群平台實作分享、開源程式庫、學術論文、商用工具官網。</p>
+<p><b>免責</b>　各 prompt 的英文原文為來源頁逐字引用；標示「如菓版改寫」者為本報告自製草稿，尚未實測。標「未覆核」「需確認」之項目表示目前無來源支撐，使用前請自行查證。AI 生成之 3D 圖為視覺示意，不具工程精度，不得作為施工、估價或報建依據。工具價格與免費額度以各官網當下公告為準。</p>
+</footer>
+
+</div>
+</body>
+</html>

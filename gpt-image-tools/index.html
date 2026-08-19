@@ -127,6 +127,7 @@ footer p{margin:0 0 6px}
     <li><b>先把「空間不准變」寫成固定的一段提示詞。</b>抄 <a href="https://github.com/zyliu0/interior-design" target="_blank" rel="noopener">zyliu0/interior-design</a> 的空間保真規則——鎖住牆體、窗戶位置與相機角度，只換材質、燈光與家具；這是補掃唯一明確走 OpenAI 生圖介面的室內設計專案，也直接對應目前出圖最常見的走位問題。</li>
     <li><b>自架出圖台，並補做一次引擎比較。</b>用 <a href="https://github.com/alasano/gpt-image-playground" target="_blank" rel="noopener">alasano/gpt-image-playground</a> 取得聊天窗給不了的遮罩局部改圖與每張成本可追溯（需自備金鑰並設密碼）；同時用同一組室內提示詞把 gpt-image-2 與 Google 的 Nano Banana Pro 並排比一次——競品提示詞庫的星數（10,245 與 13,231）已高過多數 gpt-image-2 庫，選型不該只憑習慣。</li>
   </ul>
+  <p class="hint" style="margin-top:10px">詳細可行性評估見第七節（十項建議的成本、效益、風險與優先序總表，含試辦步驟、驗收指標與停損條件）。</p>
   <p style="margin-top:12px"><b>GitHub 上沒有什麼</b>：沒有任何能微調（fine-tune）ChatGPT 或 gpt-image-2 的工具——官方不開放這個模型微調，所以這條路在開源界根本不存在。至於「室內設計專用專案」，補掃後修正原先的說法：確實存在，但可直接用於 ChatGPT 出圖的只有 <a href="https://github.com/zyliu0/interior-design" target="_blank" rel="noopener">zyliu0/interior-design</a> 一個個人輕量專案（1 star、5 個檔案）；其餘室內專用工具（ArchAi3d、interior-designer-ai、sd-interior-design、decor8ai）全走 Qwen／Replicate／Stable Diffusion／商用 API 路線，只能抄結構、不能直接用。</p>
   <p class="hint" style="margin-top:10px">本節已含補掃結果。</p>
 </div>
@@ -193,7 +194,7 @@ footer p{margin:0 0 6px}
         <dt>怎麼用</dt><dd>直接讀 <code>examples/Generate_Images_With_GPT_Image.ipynb</code> 與 <code>Generate_Images_With_High_Input_Fidelity.ipynb</code>，照官方參數表逐項對照現行流程有沒有漏用（<code>input_fidelity</code>、<code>size</code>、<code>quality</code>）</dd>
         <dt>注意</dt><dd>泛用範例、非室內設計專用，室內場景提示詞仍要自己套；MIT 授權</dd>
       </dl>
-      <p class="corr">補掃補位：這正是第八節「缺口一」點名的一手正本。原報告排第一的那份指南，自己就標明內容源自這裡；現在改以官方原文為準、二手備份降為對照。</p>
+      <p class="corr">補掃補位：這正是第九節「缺口一」點名的一手正本。原報告排第一的那份指南，自己就標明內容源自這裡；現在改以官方原文為準、二手備份降為對照。</p>
     </article>
     <article class="card">
       <div class="card-head">
@@ -325,7 +326,7 @@ footer p{margin:0 0 6px}
     </article>
 
 <h2>三之二、補掃：室內設計專用工具、一手來源與競品引擎</h2>
-<p>把關員對前一輪最重的一句話是：<b>「36 張卡沒有一個是為室內設計而生的。」</b>原因在第八節說得很清楚——六個搜尋角度全繞著生圖模型與提示詞打轉，沒有把「室內設計」「虛擬佈置」當成獨立關鍵字去搜，也整份漏掉官方一手來源。本節針對這兩個缺口補讀 <b>13 個專案</b>，另有 5 筆僅列名。</p>
+<p>把關員對前一輪最重的一句話是：<b>「36 張卡沒有一個是為室內設計而生的。」</b>原因在第九節說得很清楚——六個搜尋角度全繞著生圖模型與提示詞打轉，沒有把「室內設計」「虛擬佈置」當成獨立關鍵字去搜，也整份漏掉官方一手來源。本節針對這兩個缺口補讀 <b>13 個專案</b>，另有 5 筆僅列名。</p>
 <p>補掃的結論分三句：<b>一手來源確實漏了</b>，官方範例集就在那裡且今日仍在更新；<b>室內設計專用工具確實存在但幾乎都不走 OpenAI</b>，13 個裡只有 4 個真的用 OpenAI 生圖介面（S01、S02、S03、S04，另 S08、S12 走轉售商）；<b>競品陣營的聲量已經超車</b>，兩個 Nano Banana Pro 提示詞庫合計 23,476 star，比本報告任何一個 gpt-image-2 庫都高，選型該重測一次而不是憑習慣。</p>
 <p class="hint">以下依實用分由高至低排列，編號 S01–S13 以區別第三節。授權欄位標「未標示」者，商用前一律先確認。</p>
 
@@ -567,11 +568,238 @@ footer p{margin:0 0 6px}
   <p><b>明確不採用</b>：avillabon 的後處理節點（授權禁止商用）。但它點出的問題是真的——出圖後處理該進如菓流程，實作請用自有管線，不要用這個節點。</p>
 </div>
 
-<h2>七、未深讀清單（57 筆）</h2>
+<h2>七、可行性評估與建議</h2>
+<p>把前六節的發現換算成「做不做、什麼時候做、要花多少」。十項建議依優先序分三堆：<b>現在就做 3 項</b>（純整理，零費用、當週可完成）、<b>短期試辦 5 項</b>（1–2 週內小規模驗證，其中 ④⑥⑨ 三項需自備金鑰按用量計價）、<b>暫不建議 2 項</b>。表格欄位窄，判斷理由與做法細節寫在表後的逐項展開。</p>
+
+<div class="tw"><table>
+<thead><tr><th>建議項</th><th>對應資源</th><th>技術可行性</th><th>成本<br>費用／時間／人力</th><th>預期效益</th><th>主要風險</th><th>優先序</th></tr></thead>
+<tbody>
+<tr>
+<td class="nm">① 官方提示詞指南與室內專館併入知識檔</td>
+<td><a href="https://github.com/openai/openai-cookbook" target="_blank" rel="noopener">openai-cookbook</a>（75,345 star・MIT）<br><a href="https://github.com/wuyoscar/GPT-Image2-Skill" target="_blank" rel="noopener">GPT-Image2-Skill</a>（4,730 star・MIT）</td>
+<td>高｜純文字擷取，不必安裝程式，兩者 MIT 可商用</td>
+<td>免費<br>3–4 小時<br>老闆自己</td>
+<td>參數不漏用，提示詞有官方骨架</td>
+<td>備份可能與官方脫節，以官方為準</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td class="nm">② 空間保真主提示詞併入知識檔</td>
+<td><a href="https://github.com/zyliu0/interior-design" target="_blank" rel="noopener">zyliu0/interior-design</a>（1 star・MIT）</td>
+<td>高｜只抄一段規則，不依賴該專案後續維護</td>
+<td>免費<br>1–2 小時<br>老闆自己</td>
+<td>鎖住牆體、開窗與相機角度，治走位</td>
+<td>僅 1 star 未經驗證；風格庫要自己補</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td class="nm">⑧ 三個提示詞庫的室內專用摘錄</td>
+<td><a href="https://github.com/freestylefly/awesome-gpt-image-2" target="_blank" rel="noopener">freestylefly</a>（11,316 star・室內 12 則）<br><a href="https://github.com/useneospark/awesome-gpt-image-2" target="_blank" rel="noopener">useneospark</a>（85 star・7 則）<br><a href="https://github.com/YouMind-OpenLab/awesome-gpt-image-2" target="_blank" rel="noopener">YouMind</a>（9,356 star・CC BY 4.0）</td>
+<td>高｜摘錄與翻寫，無安裝需求</td>
+<td>免費<br>2–3 小時<br>老闆自己</td>
+<td>19 則現成室內範本＋結構化拆解法</td>
+<td>夾帶業配；YouMind 素材在其商業網站</td>
+<td><span class="pill">現在就做</span></td>
+</tr>
+<tr>
+<td class="nm">③ 本機 ComfyUI 掛室內設計工具箱試跑</td>
+<td><a href="https://github.com/amir84ferdos/ComfyUI-ArchAi3d-Qwen" target="_blank" rel="noopener">ComfyUI-ArchAi3d-Qwen</a>（68 star・授權未標示）</td>
+<td>中｜節點可裝，但完整流程檔要付費、引擎是 Qwen</td>
+<td>需確認<br>半天<br>老闆自己</td>
+<td>材質預設與三段式改圖邏輯可改寫成中文模板</td>
+<td>授權未標示須先確認；付費牆擋住完整流程檔</td>
+<td><span class="pill warn">短期試辦</span><br><span style="font-size:.76rem;color:var(--muted)">1–2 週</span></td>
+</tr>
+<tr>
+<td class="nm">④ 自架出圖台：遮罩局部改圖＋成本追蹤</td>
+<td><a href="https://github.com/alasano/gpt-image-playground" target="_blank" rel="noopener">gpt-image-playground</a>（244 star）</td>
+<td>中高｜一鍵部署可用；需組織驗證，預設公開要自設密碼</td>
+<td>需確認<br>半天＋1 天試跑<br>老闆自己</td>
+<td>局部改圖不必整張重生；每張成本可追溯</td>
+<td>未設密碼等於金鑰任人使用</td>
+<td><span class="pill warn">短期試辦</span><br><span style="font-size:.76rem;color:var(--muted)">1–2 週</span></td>
+</tr>
+<tr>
+<td class="nm">⑥ 兩引擎並排比較（同一組室內提示詞）</td>
+<td><a href="https://github.com/ZeroLu/awesome-nanobanana-pro" target="_blank" rel="noopener">awesome-nanobanana-pro</a>（10,245 star・室內專章）<br><a href="https://github.com/nateherkai/gpt-image-2-vs-nano-banana-2" target="_blank" rel="noopener">對比管線範本</a>（26 star）</td>
+<td>高｜不必寫程式，靠同一組提示詞加一張固定評分表</td>
+<td>需確認<br>1 天<br>老闆自己</td>
+<td>引擎選型由憑習慣改成有數據（第九節缺口三）</td>
+<td>小樣本結論可能不穩，需先訂評分表</td>
+<td><span class="pill warn">短期試辦</span><br><span style="font-size:.76rem;color:var(--muted)">1–2 週</span></td>
+</tr>
+<tr>
+<td class="nm">⑦ 出圖後去瑕疵（過度銳化與雜點）</td>
+<td><a href="https://github.com/Larryvrh/gpt-image-2-artifact-cleaner" target="_blank" rel="noopener">artifact-cleaner 上游</a>（15 star・授權未標示）</td>
+<td>中｜線上示範可免費驗效果；本機批次要顯卡，純 CPU 慢 10 倍</td>
+<td>免費<br>2 小時＋部署半天<br>老闆自己</td>
+<td>去掉輸出特有瑕疵，真實感提升</td>
+<td>授權未標示須先取得書面說明</td>
+<td><span class="pill warn">短期試辦</span><br><span style="font-size:.76rem;color:var(--muted)">1–2 週</span></td>
+</tr>
+<tr>
+<td class="nm">⑨ 官方生圖直連節點串進本機管線</td>
+<td><a href="https://github.com/lintsinghua/ComfyUI-Model-Official-API" target="_blank" rel="noopener">ComfyUI-Model-Official-API</a>（1 star・MIT・官方直連）<br>替代：<a href="https://github.com/Anil-matcha/gpt-image-2-comfyui" target="_blank" rel="noopener">Anil-matcha 節點</a>（1 star・轉售商）</td>
+<td>中｜安裝不難，但僅 1 star 無社群驗證、文件為簡體中文</td>
+<td>需確認<br>半天<br>需工程協助</td>
+<td>官方生圖進本機管線，適合批次量產</td>
+<td>新專案穩定性未驗證，轉售商版本更差</td>
+<td><span class="pill warn">短期試辦</span><br><span style="font-size:.76rem;color:var(--muted)">1–2 週，接在 ④ 之後</span></td>
+</tr>
+<tr>
+<td class="nm">⑤ 上傳實景照換風格的示範程式試用</td>
+<td><a href="https://github.com/siegblink/interior-designer-ai" target="_blank" rel="noopener">interior-designer-ai</a>（208 star・MIT）</td>
+<td>中｜程式可跑，但引擎走 Replicate，要用官方生圖得改後端</td>
+<td>需確認<br>半天以上<br>需工程協助</td>
+<td>有限：只有介面分類法可參考</td>
+<td>純示範非生產級，工不如花在 ④</td>
+<td><span class="pill off">暫不建議</span></td>
+</tr>
+<tr>
+<td class="nm">⑩ 付費雲端代理把生圖併進節點圖</td>
+<td><a href="https://github.com/AtlasCloudAI/atlascloud_comfyui" target="_blank" rel="noopener">atlascloud_comfyui</a>（25 star）</td>
+<td>中｜一把金鑰調用多家雲端模型、免自建 GPU</td>
+<td>需確認<br>半天<br>需工程協助</td>
+<td>增量有限，⑥ 即可達成同樣比較</td>
+<td>受制於第三方；案場照片須經其伺服器</td>
+<td><span class="pill off">暫不建議</span></td>
+</tr>
+</tbody></table></div>
+
+<p class="hint">成本欄說明：時間為工時估算（依各專案說明文件的安裝與閱讀量推估），非實測值；人力欄標「老闆自己」者，遇技術卡關（例如 ④ 的組織驗證、⑦ 的本機顯卡環境）仍需工程協助。費用標「需確認」的五項，各自的估算依據是——③ 節點免費、完整流程檔需作者付費訂閱且未列價；④⑨ 程式與節點免費，生圖按官方用量計價（建議先設每月用量上限）；⑥ 估算量為 3 案場 × 3 張 × 2 引擎＝18 張的小量測試；⑤ 程式免費、第三方生圖平台另按量計費；⑩ 第三方代理需付費金鑰、專案未列價目。凡走生圖介面者皆需自備金鑰，與聊天訂閱分開計算；本報告未取得任何一家的官方單價，採用前以當時官方價目為準。</p>
+
+<h3>逐項展開：現在就做（3 項）</h3>
+<p class="hint">以下八項展開只涵蓋「現在就做」與「短期試辦」；⑤、⑩ 已判暫不建議，不展開。「格局保真五項檢核」在本節統一定義為如菓自訂的五項：牆體位置／開窗位置與大小／門洞位置／相機角度與鏡頭高度／地坪範圍。</p>
+
+<div class="box">
+  <h4>① 官方提示詞指南與室內專館併入知識檔</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>讀官方兩份生圖範例，把參數表（輸入保真度、尺寸、品質等級）與各參數的實際效果差異抄成一張對照表。</li>
+    <li>取室內專館那份官方指南備份（約 1,004 行）與「Architecture &amp; Interior」圖庫，只留與室內場景有關的段落。</li>
+    <li>兩者併成知識檔的新一節：官方原文標「準則」、備份標「對照」，兩邊衝突一律以官方為準。</li>
+    <li>把第五節 16 條原則附在同一節末尾當操作守則，並在 GPT 專案指令裡指定出圖前先讀這一節。</li>
+    <li>用 3 個真實需求各出 3 張，驗一次流程有沒有真的照新參數表走。</li>
+  </ol>
+  <p><b>驗收指標</b>：導入前先用現行流程跑同一批需求、記下「一次過關張數」當基準（目前沒有紀錄，需先量一次）；導入後目標 9 張中至少 6 張一次過關。參數對照表逐項打勾，現行流程漏用的參數補齊率 100%。</p>
+  <p><b>停損條件</b>：整理超過 6 小時仍拼不出可操作的參數對照表，或導入後一次過關張數沒有高於基準，就退回原流程，改從 ⑥ 的引擎比較找原因。</p>
+</div>
+
+<div class="box">
+  <h4>② 空間保真主提示詞併入知識檔</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>抄該專案系統提示檔那段空間保真規則，翻成中文，固定成每一則室內提示詞的開頭。</li>
+    <li>明訂五項不可變（即上述格局保真五項檢核）；可變的只有材質、燈光與家具陳設，這句要寫死。</li>
+    <li>依第五節第 14 條，把改圖指令拆成「要移除什麼／一定要畫成什麼／哪些是可選加分項」三段分寫。</li>
+    <li>選一個手上真實案場的實景照跑 5 張，逐張對五項檢核打勾。</li>
+    <li>通過就寫進知識檔當固定開頭，之後不再逐案改寫這一段。</li>
+  </ol>
+  <p><b>驗收指標</b>：5 張測試圖的五項檢核平均通過數 ≥ 4.5 項（滿分 5）；同一需求的改圖來回輪數低於導入前（導入前輪數需先記一次當基準）。</p>
+  <p><b>停損條件</b>：連續兩批共 10 張，五項檢核平均低於 4 項，代表這段規則鎖不住空間骨架，改走 ④ 的遮罩局部改圖為主力。</p>
+</div>
+
+<div class="box">
+  <h4>⑧ 三個提示詞庫的室內專用摘錄</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>取第一個庫的「建築與空間」12 則、第二個庫的「室內」7 則，合計 19 則。</li>
+    <li>逐則翻成中文，並套進五段式（任務類型／主體描述／風格定義／技術參數／輸出規格）。</li>
+    <li>第三個庫的室內素材需上其商業網站取得，取用時依 CC BY 4.0 標示來源；另一個中文庫只取五段式框架、案例不取（庫內沒有室內類目），其站內第三方轉發連結一律不碰。</li>
+    <li>依空間類型（客廳／主臥／廚房／衛浴／玄關）分類歸檔，每類至少 3 則。</li>
+    <li>每類抽 1 則實跑，確認語意翻成中文後沒有走樣。</li>
+  </ol>
+  <p><b>驗收指標</b>：五類空間各備妥 ≥3 則可直接套用的中文範本（合計 ≥15 則）；抽測 5 則的出圖可用率 ≥ 3/5。</p>
+  <p><b>停損條件</b>：翻寫後抽測可用率低於 2/5，代表這批案例與如菓案型不合，停止整批搬運，改以 ① 的官方骨架自建範本。</p>
+</div>
+
+<h3>逐項展開：短期試辦（5 項）</h3>
+
+<div class="box">
+  <h4>③ 本機 ComfyUI 掛室內設計工具箱試跑</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>在本機 ComfyUI 安裝該工具箱節點，先確認能正常載入、不影響現有管線。</li>
+    <li>只取三樣東西：103 組材質預設清單、空間保真規則、三段式改圖邏輯。</li>
+    <li>把材質清單依大類（石材／木皮／金屬／織品／塗裝）重整成如菓自己的中文命名表，名稱統一。</li>
+    <li>用這份命名表寫 5 則提示詞，拿到官方生圖介面上出圖（不是在該工具箱的 Qwen 引擎上），驗材質詞是否有效。</li>
+    <li>有效就把命名表併進知識檔；付費流程檔不購買，只用免費節點裡拿得到的部分。</li>
+  </ol>
+  <p><b>驗收指標</b>：整理出 ≥40 組常用材質的中文統一命名；抽 5 組實測，材質外觀與命名相符者 ≥4 組。</p>
+  <p><b>停損條件</b>：節點安裝影響現有管線，或免費部分被付費牆擋住拿不到材質清單，即刻停手，改依第五節第 15 條自建材質表。</p>
+  <p class="hint">授權提醒：該專案授權未標示，只搬「材質分類與命名方法」這類作法，不把它的檔案內容複製進客戶交付物。</p>
+</div>
+
+<div class="box">
+  <h4>④ 自架出圖台取得遮罩局部改圖與成本追蹤</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>先確認組織驗證已完成——未完成就無法呼叫生圖模型，這是最容易卡住的一步，要放第一步做。</li>
+    <li>部署一份自架出圖台，<b>務必同時設定存取密碼</b>（預設部署是公開的）。</li>
+    <li>在服務後台為這把金鑰設每月用量上限，避免誤用暴衝。</li>
+    <li>挑一個真實案子跑完整流程：整張生成 → 客戶回饋 → 只用遮罩改指定區域（例如電視牆或地坪）→ 定稿。</li>
+    <li>全程記錄每張的參數與花費，跟現行聊天窗流程比對出圖品質、改圖輪數與總花費。</li>
+  </ol>
+  <p><b>驗收指標</b>：局部改圖時被改區域以外的畫面維持不變（五項檢核 5/5）；同一案子的改圖輪數低於現行流程（現行輪數需先記一次當基準）；每張圖都有可查的成本紀錄，單案生圖總花費算得出來。</p>
+  <p><b>停損條件</b>：組織驗證兩週內過不了，或試跑一個案子的生圖花費高於它省下的改圖工時價值，就收掉自架台、回聊天窗流程，並保留 ①②⑧ 的知識檔成果。</p>
+</div>
+
+<div class="box">
+  <h4>⑥ 兩引擎並排比較（同一組室內提示詞）</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>挑 3 個真實案場的實景照（建議客廳、主臥、廚房各一），代表如菓最常出的三種場景。</li>
+    <li>寫同一組提示詞（含 ② 的空間保真開頭），兩個引擎各出 3 張，合計 18 張。</li>
+    <li>依四項打分：格局保真、材質說服力、光影自然度、改圖輪數，每項 1–5 分；同一人同一天評完，避免標準漂移。</li>
+    <li>記下每張的花費與耗時（單張耗時含等待目標 ≤2 分鐘）。</li>
+    <li>出總分表，兩邊差距 ≥1 分才換主力引擎，否則維持現況。</li>
+  </ol>
+  <p><b>驗收指標</b>：18 張全數完成並有分數與成本紀錄；四項總分差距明確（≥1 分）或明確接近（&lt;0.5 分）——兩種結果都算有結論，只有「沒跑完」才算失敗。</p>
+  <p><b>停損條件</b>：出圖或評分拖過 2 天仍沒跑完，縮成 1 個案場 × 2 張先出小結；若兩邊差距在 0.5 分內，直接維持現用引擎、不再加測。</p>
+</div>
+
+<div class="box">
+  <h4>⑦ 出圖後去瑕疵</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>先用作者的線上示範，丟 5 張既有效果圖跑一次，肉眼前後比對。</li>
+    <li>有明顯改善才進下一步；沒有就到此為止，本項結案。</li>
+    <li>同步寫信向作者確認授權可否商業使用；未取得書面說明前，處理過的圖不得進客戶交付物。</li>
+    <li>授權確認可用後，才在本機裝批次版（有顯卡才跑得快），把去瑕疵列為出圖流程固定的最後一段。</li>
+    <li>全程不使用外部那個包裝節點——它的授權明文禁止商業使用。</li>
+  </ol>
+  <p><b>驗收指標</b>：5 張前後對照中，≥3 張的過度銳化與雜點肉眼可見改善、且畫面內容未被更動；授權問題取得作者書面回覆。</p>
+  <p><b>停損條件</b>：改善張數低於 3 張，或兩週內拿不到授權書面說明，即放棄本項，改用自有後製管線處理（第五節第 9 條）。</p>
+</div>
+
+<div class="box">
+  <h4>⑨ 官方生圖直連節點串進本機管線</h4>
+  <p><b>試辦步驟</b></p>
+  <ol class="steps">
+    <li>先完成 ④，確認官方生圖對如菓案型確實有效，再談批次自動化——順序顛倒會白花時間。</li>
+    <li>在本機 ComfyUI 安裝官方直連節點（MIT），金鑰放環境變數、不寫進流程檔。</li>
+    <li>先跑單張生成，再測遮罩局部重繪，最後測多張參考圖。</li>
+    <li>三項都通過後，接一批 10 張的批次出圖，比對與逐張手動操作的耗時差。</li>
+    <li>說明文件為簡體中文，安裝步驟自行整理成中文備忘，避免下次重摸一遍。</li>
+  </ol>
+  <p><b>驗收指標</b>：單張生成、遮罩重繪、多張參考圖三項功能全通；10 張批次的總耗時低於逐張手動的 60%。</p>
+  <p><b>停損條件</b>：三項功能有任一項跑不通，或安裝造成現有管線異常，即移除節點，維持 ④ 的網頁操作台出圖。</p>
+</div>
+
+<h3>對如菓三種出圖場景怎麼配</h3>
+<div class="box">
+  <ul class="tick">
+    <li><b>預售屋／新成屋交屋效果圖</b>（有實景照或建商圖面、格局不可變）：主力是 ②（空間保真主提示詞）＋④（遮罩局部改圖），交付前接 ⑦（去瑕疵）；量大時再上 ⑨ 做批次。這條線最怕走位，② 是不可省的一步——客戶對照現場會立刻看出牆和窗跑掉。</li>
+    <li><b>概念圖</b>（提案階段、還沒有現場照、目的是把方向談出來）：主力是 ①（官方參數與提示詞骨架）＋⑧（19 則室內範本），材質詞用 ③ 整理出的中文命名表；主力引擎先由 ⑥ 比較過再定。這條線允許模型自由發揮，力氣該花在風格描述與材質詞，而不是鎖格局。</li>
+    <li><b>客戶溝通圖卡</b>（同一空間比較兩三個方案、說明材質差異）：靠 ① 的參數對帳把尺寸與品質等級固定住，幾張圖才能並排比；用 ② 鎖住不變量，一次只換要討論的那一項；有爭議的單一面材用 ④ 的遮罩只改那一塊，客戶已經點頭的部分不動。</li>
+  </ul>
+</div>
+
+<h2>八、未深讀清單（57 筆）</h2>
 <p class="hint">以下為入表但未逐一讀說明文件的專案，多數星數在兩位數以下、或方向明顯偏離（Stable Diffusion 路線、非室內設計、單人練習作）。列出供日後回頭查找。原本第 12 筆的 SamurAIGPT/ai-real-estate-stager 已於本輪補掃深讀，移至第三之二節，故由 58 筆減為 57 筆。</p>
 <div class="tw"><table><thead><tr><th>名稱</th><th class="n">Stars</th><th>一句話</th></tr></thead><tbody><tr><td class="nm"><a href="https://github.com/AlpacaLabsLLC/skills-for-architects" target="_blank" rel="noopener">AlpacaLabsLLC/skills-for-architects</a></td><td class="n">314</td><td>Claude Code建築/不動產/職場策略技能包</td></tr><tr><td class="nm"><a href="https://github.com/stabgan/openrouter-mcp-multimodal" target="_blank" rel="noopener">stabgan/openrouter-mcp-multimodal</a></td><td class="n">75</td><td>MCP：透過 OpenRouter 呼叫 300+ LLM 生成圖片/影片/語音</td></tr><tr><td class="nm"><a href="https://github.com/magiccreator-ai/awesome-gpt-image-2-prompts" target="_blank" rel="noopener">magiccreator-ai/awesome-gpt-image-2-prompts</a></td><td class="n">64</td><td>gpt-image-2 提示詞精選集</td></tr><tr><td class="nm"><a href="https://github.com/prathameshparit/Intellidecor" target="_blank" rel="noopener">prathameshparit/Intellidecor</a></td><td class="n">40</td><td>用 OpenAI API＋Stable Diffusion 生成室內設計多方案</td></tr><tr><td class="nm"><a href="https://github.com/AtlasCloudAI/awesome-gpt-image-2-prompts" target="_blank" rel="noopener">AtlasCloudAI/awesome-gpt-image-2-prompts</a></td><td class="n">19</td><td>GPT Image 2 提示詞精選（每日更新）</td></tr><tr><td class="nm"><a href="https://github.com/CLOUDWERX-DEV/gpt-image-1-mcp" target="_blank" rel="noopener">CLOUDWERX-DEV/gpt-image-1-mcp</a></td><td class="n">18</td><td>gpt-image-1 生成/編輯 MCP server</td></tr><tr><td class="nm"><a href="https://github.com/ArvidWartenberg/virtual-staging" target="_blank" rel="noopener">ArvidWartenberg/virtual-staging</a></td><td class="n">15</td><td>用 Stable Diffusion inpainting 為空屋填傢俱</td></tr><tr><td class="nm"><a href="https://github.com/FMXExpress/AI-Interior-Design" target="_blank" rel="noopener">FMXExpress/AI-Interior-Design</a></td><td class="n">14</td><td>AI 室內設計改造工具（FireMonkey+Python，用 Replicate interior-design 模型）</td></tr><tr><td class="nm"><a href="https://github.com/qzh3722/awesome-nano-banana-spatial-design" target="_blank" rel="noopener">qzh3722/awesome-nano-banana-spatial-design</a></td><td class="n">12</td><td>空間設計提示詞庫（中英雙語，鎖定 Nano Banana Pro/Gemini）</td></tr><tr><td class="nm"><a href="https://github.com/lceric/comfyui-gpt-image" target="_blank" rel="noopener">lceric/comfyui-gpt-image</a></td><td class="n">11</td><td>官方 ComfyUI GPT-API 節點的自訂 fork</td></tr><tr><td class="nm"><a href="https://github.com/astra-vision/MatSwap" target="_blank" rel="noopener">astra-vision/MatSwap</a></td><td class="n">11</td><td>光照感知的圖像材質替換方法</td></tr><tr><td class="nm"><a href="https://github.com/TamerinTECH/claude-code-generate-images-mcp" target="_blank" rel="noopener">TamerinTECH/claude-code-generate-images-mcp</a></td><td class="n">9</td><td>Claude Code 內自動生成/插入圖片素材（Azure gpt-image-1+Flux）</td></tr><tr><td class="nm"><a href="https://github.com/asasasasasbc/gpt-image-1-webui" target="_blank" rel="noopener">asasasasasbc/gpt-image-1-webui</a></td><td class="n">8</td><td>gpt-image-1 的網頁操作介面</td></tr><tr><td class="nm"><a href="https://github.com/rsensui2/tekion-slide-generator" target="_blank" rel="noopener">rsensui2/tekion-slide-generator</a></td><td class="n">6</td><td>AI 簡報生成器，圖片供應商含 GPT-image-2，支援參考圖</td></tr><tr><td class="nm"><a href="https://github.com/whataicc/aiprompt" target="_blank" rel="noopener">whataicc/aiprompt</a></td><td class="n">6</td><td>AI 生圖提示詞大全，含 GPT image 2 提示詞網站</td></tr><tr><td class="nm"><a href="https://github.com/jerryzhao173985/openai-image-gen-mcp" target="_blank" rel="noopener">jerryzhao173985/openai-image-gen-mcp</a></td><td class="n">5</td><td>gpt-image-1 生成/編輯的 MCP server</td></tr><tr><td class="nm"><a href="https://github.com/SamurAIGPT/ai-room-declutter" target="_blank" rel="noopener">SamurAIGPT/ai-room-declutter</a></td><td class="n">5</td><td>開源房間整理+風格重繪 SaaS（Next.js全棧）</td></tr><tr><td class="nm"><a href="https://github.com/darya-varabei/openai_image_edit" target="_blank" rel="noopener">darya-varabei/openai_image_edit</a></td><td class="n">5</td><td>用 gpt-image-1 生成與編輯圖片的範例 App</td></tr><tr><td class="nm"><a href="https://github.com/izyid9/online-interior-design" target="_blank" rel="noopener">izyid9/online-interior-design</a></td><td class="n">5</td><td>12款線上室內設計軟體整理（零門檻出效果圖）</td></tr><tr><td class="nm"><a href="https://github.com/qzh3722/interior-design-prompt-generator" target="_blank" rel="noopener">qzh3722/interior-design-prompt-generator</a></td><td class="n">4</td><td>依參數/隨機產生室內設計提示詞的生成器</td></tr><tr><td class="nm"><a href="https://github.com/mithunparab/virtual-staging" target="_blank" rel="noopener">mithunparab/virtual-staging</a></td><td class="n">4</td><td>保留房間幾何結構的模組化虛擬傢俱生成管線</td></tr><tr><td class="nm"><a href="https://github.com/t4wefan/comfyui-gpt-image" target="_blank" rel="noopener">t4wefan/comfyui-gpt-image</a></td><td class="n">3</td><td>在 ComfyUI 使用 GPT Image 的節點</td></tr><tr><td class="nm"><a href="https://github.com/danieldaneshi/virtual-staging-ai" target="_blank" rel="noopener">danieldaneshi/virtual-staging-ai</a></td><td class="n">3</td><td>空屋照片自動布置家具的虛擬staging工具</td></tr><tr><td class="nm"><a href="https://github.com/jbrower95/mcp-asset-gen" target="_blank" rel="noopener">jbrower95/mcp-asset-gen</a></td><td class="n">3</td><td>透過 gpt-image-1 生成素材圖的 MCP server</td></tr><tr><td class="nm"><a href="https://github.com/ConardLi/gpt-image-2-101" target="_blank" rel="noopener">ConardLi/gpt-image-2-101</a></td><td class="n">3</td><td>gpt-image-2 入門範例小專案</td></tr><tr><td class="nm"><a href="https://github.com/LarryWalkerDEV/mcp-immostage" target="_blank" rel="noopener">LarryWalkerDEV/mcp-immostage</a></td><td class="n">3</td><td>AI 虛擬佈置的 MCP Server（房間分類/平面圖美化/物件優化）</td></tr><tr><td class="nm"><a href="https://github.com/engfouly1987/ArchAtlas" target="_blank" rel="noopener">engfouly1987/ArchAtlas</a></td><td class="n">2</td><td>跨國在地建築風格的互動式提示詞產生器</td></tr><tr><td class="nm"><a href="https://github.com/ashourml/pocket-gen" target="_blank" rel="noopener">ashourml/pocket-gen</a></td><td class="n">2</td><td>文字/圖轉文字的建築提示詞產生器（Ollama LLM 驅動）</td></tr><tr><td class="nm"><a href="https://github.com/belgacmyk/comfyui-gpt-image2-parallel" target="_blank" rel="noopener">belgacmyk/comfyui-gpt-image2-parallel</a></td><td class="n">2</td><td>gpt-image-2 平行批次生成節點</td></tr><tr><td class="nm"><a href="https://github.com/xeeshanajmal/Interior-Design-by-AI" target="_blank" rel="noopener">xeeshanajmal/Interior-Design-by-AI</a></td><td class="n">2</td><td>AI 室內設計構想生成器（可自訂提示詞、房型、風格）</td></tr><tr><td class="nm"><a href="https://github.com/JunaidAhammedU/AI-Room-Redesign" target="_blank" rel="noopener">JunaidAhammedU/AI-Room-Redesign</a></td><td class="n">2</td><td>AI 房間改造 Web App</td></tr><tr><td class="nm"><a href="https://github.com/design-bench/design-bench.github.io" target="_blank" rel="noopener">design-bench/design-bench.github.io</a></td><td class="n">2</td><td>DEsignBench：GPT-4V 驅動的文生圖設計評測基準</td></tr><tr><td class="nm"><a href="https://github.com/LazaUK/AIFoundry-GPT-image-1-Editing" target="_blank" rel="noopener">LazaUK/AIFoundry-GPT-image-1-Editing</a></td><td class="n">1</td><td>Azure OpenAI GPT-image-1 圖片編輯直接 API 呼叫示範</td></tr><tr><td class="nm"><a href="https://github.com/cjk-magic/openai-gpt-image-mcp" target="_blank" rel="noopener">cjk-magic/openai-gpt-image-mcp</a></td><td class="n">1</td><td>OpenAI GPT-4o/gpt-image-1 生圖編輯 MCP 工具伺服器</td></tr><tr><td class="nm"><a href="https://github.com/cjj198909/comfy_openai_image_api_azure" target="_blank" rel="noopener">cjj198909/comfy_openai_image_api_azure</a></td><td class="n">1</td><td>ComfyUI OpenAI Image API（支援 Azure OpenAI）</td></tr><tr><td class="nm"><a href="https://github.com/sallumandya1995/interiorgpt" target="_blank" rel="noopener">sallumandya1995/interiorgpt</a></td><td class="n">1</td><td>InteriorGPT：AI 驅動室內/外設計、平面圖、家具採購</td></tr><tr><td class="nm"><a href="https://github.com/Liu-Bot24/comfyui-gpt-image-bridge" target="_blank" rel="noopener">Liu-Bot24/comfyui-gpt-image-bridge</a></td><td class="n">0</td><td>多供應商 GPT 圖片生成/編輯橋接節點（Codex OAuth/OpenAI API）</td></tr><tr><td class="nm"><a href="https://github.com/graedance/comfyui-gpt-image-2" target="_blank" rel="noopener">graedance/comfyui-gpt-image-2</a></td><td class="n">0</td><td>gpt-image-2 生成/多圖編輯/成本估算節點</td></tr><tr><td class="nm"><a href="https://github.com/baiyuxi930826/image-studio" target="_blank" rel="noopener">baiyuxi930826/image-studio</a></td><td class="n">0</td><td>對話式修圖 MCP server：ComfyUI + GPT-Image-2 三方協作（規劃/生成/評審）</td></tr><tr><td class="nm"><a href="https://github.com/pengxiaoan/interior-design-prompt-optimizer" target="_blank" rel="noopener">pengxiaoan/interior-design-prompt-optimizer</a></td><td class="n">0</td><td>中文室內設計提示詞優化技能（Claude Skill）</td></tr><tr><td class="nm"><a href="https://github.com/moozhu/home-design-prompts" target="_blank" rel="noopener">moozhu/home-design-prompts</a></td><td class="n">0</td><td>家居家裝 Midjourney/Image2 提示詞生成器</td></tr><tr><td class="nm"><a href="https://github.com/amitchcal/InteriorDesignGPT" target="_blank" rel="noopener">amitchcal/InteriorDesignGPT</a></td><td class="n">0</td><td>名為 InteriorDesignGPT 的專案（無說明）</td></tr><tr><td class="nm"><a href="https://github.com/Ganeshcyberweb/InnDesignAi" target="_blank" rel="noopener">Ganeshcyberweb/InnDesignAi</a></td><td class="n">0</td><td>Interior Design GPT 應用（InnDesignAi）</td></tr><tr><td class="nm"><a href="https://github.com/Hisana-Nafeez/AI-Interior-Prompt-Optimizer" target="_blank" rel="noopener">Hisana-Nafeez/AI-Interior-Prompt-Optimizer</a></td><td class="n">0</td><td>把簡單房間構想轉成高品質 SD 室內設計提示詞</td></tr><tr><td class="nm"><a href="https://github.com/hemokid/nano-banana-library" target="_blank" rel="noopener">hemokid/nano-banana-library</a></td><td class="n">0</td><td>建築提示詞庫（Architectural prompt library）</td></tr><tr><td class="nm"><a href="https://github.com/Likhitha101/interior-design-ai-generator" target="_blank" rel="noopener">Likhitha101/interior-design-ai-generator</a></td><td class="n">0</td><td>室內設計 AI 生成器專案（描述空白）</td></tr><tr><td class="nm"><a href="https://github.com/Gautham-S0117/AI-Room-Redesign" target="_blank" rel="noopener">Gautham-S0117/AI-Room-Redesign</a></td><td class="n">0</td><td>上傳房間照→SD 重繪＋YOLOv8 家具偵測＋OpenCLIP 找同款商品</td></tr><tr><td class="nm"><a href="https://github.com/Aakif-Javeed/AI-Virtual-Home-Staging-SaaS-for-Real-Estate" target="_blank" rel="noopener">Aakif-Javeed/AI-Virtual-Home-Staging-SaaS-for-Real-Estate</a></td><td class="n">0</td><td>空屋→已布置樣品屋虛擬staging開源SaaS</td></tr><tr><td class="nm"><a href="https://github.com/dreliq9/archi" target="_blank" rel="noopener">dreliq9/archi</a></td><td class="n">0</td><td>AI-native建築/室內設計MCP server（排版+法規+渲染+輸出）</td></tr><tr><td class="nm"><a href="https://github.com/alwintsui/Comfyui-gpt-image" target="_blank" rel="noopener">alwintsui/Comfyui-gpt-image</a></td><td class="n">0</td><td>ComfyUI gpt-image 節點（OpenAI API 或代理）</td></tr><tr><td class="nm"><a href="https://github.com/cjj198909/comfyui-gpt-image-azure" target="_blank" rel="noopener">cjj198909/comfyui-gpt-image-azure</a></td><td class="n">0</td><td>Azure OpenAI 版 ComfyUI GPT Image 節點</td></tr><tr><td class="nm"><a href="https://github.com/alanwang-dev/comfyui-gpt-image-tools" target="_blank" rel="noopener">alanwang-dev/comfyui-gpt-image-tools</a></td><td class="n">0</td><td>支援多供應商 LLM 的 GPT Image 工具節點集</td></tr><tr><td class="nm"><a href="https://github.com/jozefusz/comfyui-openai-image2-node" target="_blank" rel="noopener">jozefusz/comfyui-openai-image2-node</a></td><td class="n">0</td><td>OpenAI Image Tool 的 ComfyUI 自訂節點</td></tr><tr><td class="nm"><a href="https://github.com/marciusbezerra/gpt-image-1-edit" target="_blank" rel="noopener">marciusbezerra/gpt-image-1-edit</a></td><td class="n">0</td><td>gpt-image-1 編輯功能的簡易示範頁</td></tr><tr><td class="nm"><a href="https://github.com/BlueVenn6/HavenFrame" target="_blank" rel="noopener">BlueVenn6/HavenFrame</a></td><td class="n">0</td><td>中英雙語 Windows 室內設計 AI 交付工作台</td></tr><tr><td class="nm"><a href="https://github.com/chenkun94/interior-design-ai" target="_blank" rel="noopener">chenkun94/interior-design-ai</a></td><td class="n">0</td><td>室內設計 AI 出圖平台</td></tr><tr><td class="nm"><a href="https://github.com/newaiproxy/aidesign" target="_blank" rel="noopener">newaiproxy/aidesign</a></td><td class="n">0</td><td>AI 設計工具推薦（GPT-image-2/NanoBanana 生圖）</td></tr></tbody></table></div>
 
-<h2>八、把關員指出的缺口與下一步</h2>
+<h2>九、把關員指出的缺口與下一步</h2>
 
 <div class="flag">
   <h4>缺口一（已補）：整份掃描漏掉一手來源</h4>

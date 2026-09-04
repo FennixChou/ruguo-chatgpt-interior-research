@@ -179,7 +179,7 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 <li>參考圖庫已補到 <strong>32 張</strong>（Wikimedia Commons＋Flickr，CC BY／CC BY-SA／CC0／Public Domain，可商用），十三類全部有圖；但仍有 <strong>6 類未達每類 ≥3 張</strong>——鞋櫃 1、電器櫃 1、收納櫃 1、書櫃 2、吊櫃 2、餐邊櫃 2。目標訂為「每類 ≥3 張（13×3＝39 張基準）」，以此計還缺 9 張，需再補跑素材蒐集。</li>
 <li>「立面示意版」（C 模式，正投影無透視）只適合內部溝通討論分割與材質分區，<strong>不可當客戶交付效果圖</strong>，用途邊界寫在 §7。</li>
 <li>下一步優先順序：真實 CAD 線稿接入測試（本輪 B 組線稿來自實景照片、非 CAD 圖）→ 電視櫃／玄關櫃／收納櫃三類改線稿模式驗證 → 參考圖庫補齊 → 如菓案例庫建立，逐項步驟見 §7。</li>
-<li><strong>外站六站深挖的三個結論</strong>：①線稿／白模路線被外部一手案例印證（ReRoom 有一則公開案例直接把 SketchUp 白模截圖生成寫實照，門片分割線與原模型逐一對應）；②<strong>六站沒有一家做系統櫃專屬 AI 效果圖工具，這是空白利基</strong>，我們的十三類正典＋線稿工作流是差異化資產；③櫃體設計邏輯 25 條已進正本，出圖前查表決定配置。授權紅旗一則：其中一家的服務條款明訂「輸出圖著作權完全歸平台所有」，其產出不可用於客戶交付，細節見附錄 B。</li>
+<li><strong>外站六站深挖的三個結論</strong>：①線稿／白模路線被外部一手案例印證（ReRoom 有一則公開案例直接把白模截圖生成寫實照（目視判讀為 SketchUp 白模，站方未標示來源軟體），門片分割線與原模型逐一對應）；②<strong>六站沒有一家做系統櫃專屬 AI 效果圖工具，這是空白利基</strong>，我們的十三類正典＋線稿工作流是差異化資產；③櫃體設計邏輯 25 條已進正本，出圖前查表決定配置。授權紅旗一則：其中一家的服務條款明訂「輸出圖著作權完全歸平台所有」，其產出不可用於客戶交付，細節見附錄 B。</li>
 </ol>
 
 <h2 id="s1">1. 她怎麼學的</h2>
@@ -589,7 +589,7 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 <p>差異：①–⑤ 談的是「室內設計」整體場景生圖，本報告專注「系統櫃」這一個構件類型——因為系統櫃有明確的規格正典（深度／高度／五金）與門片分割邏輯，適合用 ControlNet 線稿鎖幾何，這條路線在整體場景生圖裡不容易系統化驗證，但在單一構件上驗出了 4/4 的成功率。</p>
 
 <h2 id="sB">附錄 B：老闆指名六站深挖</h2>
-<p>老闆點名五個網域、六批內容，要看清楚「別人做到哪」與「我們能學什麼」。<strong>調查方式先講清楚</strong>：全程只讀各站公開網頁與公開的前端 JavaScript 程式碼，<strong>沒有註冊登入、沒有付費、沒有繞過付費牆、沒有觸碰任何用戶資料</strong>；圖片一律只在畫面上看、不下載入庫（少數用於「看圖回推提示詞」的公開商品圖僅本機暫存、看完即刪，未轉載）。各站服務條款、定價與提示詞均逐字引用原文，不改寫。</p>
+<p>老闆點名五個網域、六批內容，要看清楚「別人做到哪」與「我們能學什麼」。<strong>調查方式先講清楚</strong>：全程只讀各站公開網頁與公開的前端 JavaScript 程式碼，<strong>沒有註冊登入、沒有付費、沒有繞過付費牆、沒有觸碰任何用戶資料</strong>；圖片一律只在畫面上看、不下載入庫（少數用於「看圖回推提示詞」的公開商品圖僅本機暫存、看完即刪，未轉載）。ReRoom／paintit／easy-peasy 三站的服務條款、定價與提示詞均逐字引用原文，不改寫。</p>
 <p class="src">六批＝ReRoom AI／paintit.ai／easy-peasy.ai／阿里巴巴（hebrew.alibaba.com）／ecywang.com 款式語彙頁／ecywang.com 六類設計邏輯頁。</p>
 
 <h3>B-1 ReRoom AI（<a href="https://tw.reroom.ai/" target="_blank" rel="noopener">tw.reroom.ai</a>）</h3>
@@ -630,8 +630,8 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 <li>電視櫃機能清單法（含離地高）：<code>Modern TV panel design for 8x8 feet wall, 55-inch TV, glass door cupboards, bookshelf, drawers, cupboards 8 inches from ground.</code></li>
 </ul>
 <p><strong>不能學什麼</strong>：頁面沒有尺寸／長寬比欄位，也沒有負面提示詞欄位（29 筆全數皆無）。約半數提示詞只有 3–6 個字，靠平台的「改既有照片」模式撐效果，文字本身沒有可轉譯的設計資訊。另有一個陷阱：站方近期把大量舊圖批次換模型重生，<strong>頁面顯示的模型是「現在的」而非「當初出圖的」</strong>——同一頁顯示 Nano Banana 2，記錄裡的原始模型其實是 FLUX.1／Imagen 3／Imagen 4／Recraft v3／Stable Diffusion 3.0／Seedream 4.0 不等。引用時兩個欄位都要記。</p>
-<p><strong>授權結論</strong>：使用條款逐字——免費用戶的輸出僅限非商業用途；付費用戶訂閱期間生成的輸出享完整商業權利，且訂閱到期後權利仍保留。抄「文字」（提示詞不是圖像）本身沒有著作權疑慮；但要商用「該站生成的圖」，必須是付費帳號生成的。訂閱價本輪未取得逐字原文，標「需確認」。</p>
-<p><strong>值不值得訂閱</strong>：<span class="badge badge-warn">補充來源，不做主力</span> 全站 4.2 萬張圖庫，用關鍵字比對僅約 30–40 張沾邊系統櫃，鞋櫃、展示櫃幾乎沒有，命中率太低。</p>
+<p><strong>授權結論</strong>：使用條款（<a href="https://easy-peasy.ai/terms-of-use" target="_blank" rel="noopener">easy-peasy.ai/terms-of-use</a>，2026-09-04 抓存全文）逐字兩句——免費帳號：<code>Free Users: If You use our Website/Services free of charge, You may only use the Output for non-commercial purposes.</code>；付費帳號：<code>Paid Users: If You use our Website/Services through a paid subscription, You retain full commercial rights to all Output generated during Your active subscription period. These rights remain with You even after Your subscription ends.</code>。條款並自行定義 <code>&quot;Output&quot; refers to any content generated through the Website/Services, including AI-generated text, images, audio, video, voiceovers, and other creative works.</code>，圖片同受此條規範。白話：抄「文字」（提示詞不是圖像）本身沒有著作權疑慮；但要商用「該站生成的圖」，必須是付費帳號在訂閱有效期間內生成的，且訂閱到期後該批圖的商業權利仍保留。訂閱價本輪未取得逐字原文，標「需確認」。</p>
+<p><strong>值不值得訂閱</strong>：<span class="badge badge-warn">補充來源，不做主力</span> 全站約 4 萬張圖庫（站方首頁宣稱，本輪未留證），用關鍵字比對僅約 30–40 張沾邊系統櫃，鞋櫃、展示櫃幾乎沒有，命中率太低。</p>
 
 <h3>B-4 阿里巴巴商品頁（<a href="https://hebrew.alibaba.com/g/price-master-bedroom-furniture.html" target="_blank" rel="noopener">hebrew.alibaba.com</a>）</h3>
 <p><strong>定位</strong>：跨境 B2B 批發型錄，每項商品標最小訂購量。</p>
@@ -642,7 +642,7 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 <p><strong>值不值得訂閱</strong>：<span class="badge badge-fail">不適用（非訂閱制），且不列為常用來源</span> 若日後真要抓 Alibaba 的衣櫃語彙，須另找 wardrobe 批發類目頁。</p>
 
 <h3>B-5 ecywang.com 款式語彙頁（<a href="https://ecywang.com/pic/%E9%9E%8B%E6%9F%9C%E8%AE%BE%E8%AE%A1%E5%9B%BE%E5%85%A5%E6%88%B7/" target="_blank" rel="noopener">鞋櫃設計圖入戶</a>）</h3>
-<p><strong>定位</strong>：中國的 SEO 型圖片聚合站，用大量標題堆疊做搜尋引流。</p>
+<p><strong>定位</strong>：中國的 SEO 型圖片聚合站，用大量標題堆疊做搜尋引流。<strong>它不是 AI 工具站，沒有生圖管線可學</strong>——這一站學的是款式命名語彙與設計邏輯，不是技術。</p>
 <p><strong>我們讀了什麼</strong>：該關鍵字頁的公開標題與圖說文字；部分公開圖片用於看圖回推提示詞，本機暫存、看完即刪。</p>
 <p><strong>學到什麼</strong>：萃取出五大鞋櫃款式命名——弧形造型（<code>curved</code>）、轉角型（<code>corner-type</code>）、到頂式（<code>floor-to-ceiling</code>）、帶鏡子款（<code>with mirror</code>）、一體式玄關櫃（<code>integrated entryway cabinet</code>），簡中→繁中→英文已對照完成；「換鞋凳」（<code>shoe-changing bench</code>）是台灣客戶常提的加購需求詞。另外做了兩次回推提示詞的實跑回測，結果誠實記錄：純文字回推鞋櫃「部分過關」（材質色調與門片分割還原，但拱弧鏤空展示格被模型誤讀成整片門打開）；再拿原圖當風格參考做二次測試，<strong>學得到氛圍與光線戲劇感，學不到精確材質</strong>（米白烤漆被畫成淺橡木紋）——所以還不能說我們「複製了外站的渲染風格」。複合型玄關櫃更難，純文字回推嚴重偏題，該類型要改走線稿路線。</p>
 <p><strong>不能學什麼</strong>：沒有任何材質、五金、尺寸細節，純標題堆疊，部分內容年份已過時（2023）。</p>
@@ -650,7 +650,7 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 <p><strong>值不值得訂閱</strong>：<span class="badge badge-fail">不適用（非訂閱制），一次撈完款式詞即可</span></p>
 
 <h3>B-6 ecywang.com 六類設計邏輯頁</h3>
-<p><strong>定位</strong>：同一站的鞋櫃／玄關櫃／衣櫃／電視櫃／餐邊櫃／書櫃六類圖庫頁。</p>
+<p><strong>定位</strong>：同一站的鞋櫃／玄關櫃／衣櫃／電視櫃／餐邊櫃／書櫃六類圖庫頁。<strong>同樣不是 AI 工具站、無管線可學，學的是設計邏輯。</strong>另需說明：這些圖庫圖多為 3D 渲染圖或系統櫃品牌的行銷效果圖，不是實景照，因此我們只取「機能分區與比例的重複規律」，不取材質真實度、光線或施工可行性。</p>
 <p><strong>我們讀了什麼</strong>：六類頁面各取一批公開圖，逐張看圖歸納機能分區、比例與分割的重複規律；圖僅本機暫存、看完即刪。</p>
 <p><strong>學到什麼</strong>：歸納出 <strong>25 條設計邏輯規則</strong>（鞋櫃 5／玄關櫃 3／衣櫃 5／電視櫃 4／餐邊櫃 4／書櫃 4），每條標出現頻率並轉寫成英文提示詞片段，另配六句配置骨架句。例如鞋櫃的「懸空底部留 20cm 放常穿鞋」出現 9/16 張、「頂櫃」14/16 張；電視櫃的「懸浮矮櫃＋開放格放機上盒＋兩側封閉抽屜」6/6 張全中。這批規則已寫進內部正本，出圖前先查表決定配置，不再憑印象拼。</p>
 <p><strong>不能學什麼</strong>：中國圖庫案場的天花淨高習慣較高，衣櫃整體高度目視落在 260–280cm，與台灣常用的 210–240cm 有落差；凡衝突一律以我們自己的尺度正典為準。</p>
@@ -659,8 +659,8 @@ footer.page-footer a{color:var(--muted); text-decoration:underline;}
 
 <h3>B-7 對如菓的三個結論</h3>
 <ol>
-<li><strong>線稿／白模路線被外部一手案例印證了。</strong> ReRoom 有一則公開案例是直接上傳 SketchUp 白模截圖生成寫實照，門片分割線、玻璃櫃格柵、檯面形狀與原模型逐一對應。這正是本報告 §5 B 組（線稿轉效果圖）走的路，外部證據支持這條路線可靠——也讓 §7 待辦裡「真實 CAD 線稿接入測試」的優先度往上提。</li>
-<li><strong>市場上沒有系統櫃專屬工具，這是空白利基。</strong> ReRoom 的 27 種風格、29 種空間類型裡，「櫃體」只是通用家具偵測標籤，唯一的垂直建材小工具是浴室磁磚；paintit 有衣櫃與廚房子站但沒有食品櫃、沒有電視牆；easy-peasy 四萬多張圖庫只有三、四十張沾邊。六站沒有一家做「系統櫃專屬」的 AI 效果圖工具——我們這套十三類規格正典＋分類範本＋線稿工作流，在市場上是差異化資產，方向不必抄任何一家。反過來可借鏡的是介面思路：ReRoom 的「先放參數化 3D 元件再讓 AI 融合」與「材質優先／尺寸優先」二選一按鈕，都適合放進交付流程給客戶選。</li>
+<li><strong>線稿／白模路線被外部一手案例印證了。</strong> ReRoom 有一則公開案例是直接上傳白模截圖生成寫實照（目視判讀該案例頁原始圖研判為 SketchUp 白模，站方未標示來源軟體），門片分割線、玻璃櫃格柵、檯面形狀與原模型逐一對應。這正是本報告 §5 B 組（線稿轉效果圖）走的路，外部證據支持這條路線可靠——也讓 §7 待辦裡「真實 CAD 線稿接入測試」的優先度往上提。</li>
+<li><strong>市場上沒有系統櫃專屬工具，這是空白利基。</strong> ReRoom 的 27 種風格、29 種空間類型裡，「櫃體」只是通用家具偵測標籤，唯一的垂直建材小工具是浴室磁磚；paintit 有衣櫃與廚房子站但沒有食品櫃、沒有電視牆；easy-peasy 約四萬張圖庫（站方宣稱）只有三、四十張沾邊。六站沒有一家做「系統櫃專屬」的 AI 效果圖工具——我們這套十三類規格正典＋分類範本＋線稿工作流，在市場上是差異化資產，方向不必抄任何一家。反過來可借鏡的是介面思路：ReRoom 的「先放參數化 3D 元件再讓 AI 融合」與「材質優先／尺寸優先」二選一按鈕，都適合放進交付流程給客戶選。</li>
 <li><strong>25 條櫃體設計邏輯已進內部正本，出圖前先查表。</strong> 鞋櫃、玄關櫃、衣櫃、電視櫃、餐邊櫃、書櫃六類的機能分區與比例規則，現在是查表決定配置、再進提示詞，而不是每次憑印象重寫。搭配這輪從三個 AI 工具站借到的句式（保結構句、鎖格局收尾句、把尺寸寫進提示詞），範本的顆粒度可以再上一階。</li>
 </ol>
 <p class="src">附註：外站提示詞在我們自己的管線（ComfyUI SDXL／ChatGPT）重跑驗證之前，一律視為未驗證。各站服務條款與定價為 2026-09-04 查證當下的公開內容，日後可能異動，商用前請再確認一次。</p>
